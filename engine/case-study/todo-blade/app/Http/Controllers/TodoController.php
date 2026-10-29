@@ -1,0 +1,113 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreTodoRequest;
+use App\Http\Requests\UpdateTodoRequest;
+use App\Models\Todo;
+use App\Support\FaultRegistry;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class TodoController extends Controller
+{
+    public function index(Request $request): View
+    {
+        // Eval-only pagination fault: error out beyond the first page so pagination tests fail.
+        abort_if(FaultRegistry::is('pagination_off_by_one') && (int) $request->query('page', '1') > 1, 500);
+
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', 'in:all,done,undone'],
+        ]);
+
+        $query = auth()->user()->isAdmin()
+            ? Todo::with('user')
+            : auth()->user()->todos();
+
+        $query
+            ->when(FaultRegistry::is('search_filter_ignored') ? null : ($filters['search'] ?? null), function ($query, string $search): void {
+                $query->where(function ($query) use ($search): void {
+                    $query
+                        ->where('title', 'like', "%{$search}%")
+                        ->orWhere('body', 'like', "%{$search}%")
+                        ->orWhere('contact_email', 'like', "%{$search}%");
+                });
+            })
+            ->when(($filters['status'] ?? 'all') === 'done', fn ($query) => $query->where('done', true))
+            ->when(($filters['status'] ?? 'all') === 'undone', fn ($query) => $query->where('done', false));
+
+        return view('todos.index', [
+            'filters' => [
+                'search' => $filters['search'] ?? '',
+                'status' => $filters['status'] ?? 'all',
+            ],
+            'todos' => $query->latest()->paginate(10)->withQueryString(),
+        ]);
+    }
+
+    public function create(): View
+    {
+        return view('todos.create');
+    }
+
+    public function store(StoreTodoRequest $request): RedirectResponse
+    {
+        // Eval-only crud fault: skip persistence so the create happy-path assertion fails.
+        if (! FaultRegistry::is('crud_skip_persist')) {
+            auth()->user()->todos()->create($request->validated() + ['done' => $request->boolean('done')]);
+        }
+
+        return redirect('/todos');
+    }
+
+    public function edit(Todo $todo): View
+    {
+        $this->authorizeTodo($todo);
+
+        return view('todos.edit', ['todo' => $todo]);
+    }
+
+    public function update(UpdateTodoRequest $request, Todo $todo): RedirectResponse
+    {
+        $this->authorizeTodo($todo);
+        // Eval-only crud fault: skip persistence so the update happy-path assertion fails.
+        if (! FaultRegistry::is('crud_skip_persist')) {
+            $todo->update($request->validated() + ['done' => $request->boolean('done')]);
+        }
+
+        return redirect('/todos');
+    }
+
+    public function destroy(Todo $todo): RedirectResponse
+    {
+        $this->authorizeTodo($todo);
+        // Eval-only crud fault: report success without deleting.
+        if (! FaultRegistry::is('crud_delete_noop')) {
+            $todo->delete();
+        }
+
+        return redirect('/todos');
+    }
+
+    public function toggle(Todo $todo): RedirectResponse
+    {
+        $this->authorizeTodo($todo);
+        // Eval-only crud fault: the toggle does nothing.
+        if (! FaultRegistry::is('crud_toggle_noop')) {
+            $todo->update(['done' => ! $todo->done]);
+        }
+
+        return back();
+    }
+
+    private function authorizeTodo(Todo $todo): void
+    {
+        // Eval-only authz fault: drop the ownership check so any user can touch any todo.
+        if (FaultRegistry::is('authz_ownership_open')) {
+            return;
+        }
+        abort_unless(auth()->user()->isAdmin() || $todo->user_id === auth()->id(), 403);
+    }
+}

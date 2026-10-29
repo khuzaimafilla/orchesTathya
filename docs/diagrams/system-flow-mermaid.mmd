@@ -1,0 +1,127 @@
+%% TathyaTest Web Orchestrator System Flow
+%% Academic Swimlane Diagram with 4 Strict Pools
+flowchart TD
+
+    subgraph Pool1 ["Pool 1: Output for User (Presentation / Evaluation Documents)"]
+        direction TB
+        P1_Start(["Start: QA Respondent Accesses Web Orchestrator"])
+        P1_Config["User Inputs Target URL, Login Path & Role Credentials"]
+        P1_ViewGraph["User Presentation: Interactive DOM Node Graph & Forms"]
+        P1_GenClick["User Action: Select Tiers (Positive/Negative/Edge) & Click Generate"]
+        P1_RunClick["User Action: Select Scenarios & Click Execute Test Suite"]
+        P1_ViewReport["User Presentation: Review Test Results & Latency Metric (ΔTime)"]
+        P1_FillSUS["Research Evaluation: Complete 10-Item SUS Survey (1-5 Likert)"]
+        P1_End(["End: Evaluation & Benchmark Session Complete"])
+    end
+
+    subgraph Pool2 ["Pool 2: Client (Frontend UI - Next.js)"]
+        direction TB
+        P2_Status["Initial Page Load: Poll Engine Availability (GET /api/orchestrator/status)"]
+        P2_Queue["Waiting Room Banner: Status BUSY (Assigned Position #N in Queue)"]
+        P2_Ready["Guided Config Form: Status IDLE (Lock Granted)"]
+        P2_CrawlBtn["Form Submission: Click 'Start Crawl' (POST /api/orchestrator/crawl)"]
+        P2_Console["Virtual Console: Render Live Terminal Stream (xterm.js / SSE)"]
+        P2_Graph["Interactive Graph Visualizer: Render DOM Navigation Topology (React Flow)"]
+        P2_PostGen["Trigger Test Generation: POST /api/orchestrator/generate (--fresh, --read-only)"]
+        P2_Table["Test Scenario Catalog Table: Render Scenarios, Badges & Checkboxes"]
+        P2_PostRun["Trigger Test Suite Execution: POST /api/orchestrator/run (--project, --grep)"]
+        P2_Dashboard["Execution Dashboard: Pass/Fail/Skip Badges, Latency Widget (ΔTime) & HTML Report"]
+        P2_ModalSUS["Evaluation Modal: Trigger SUS Questionnaire Pop-up"]
+        P2_SubmitSUS["Submit Survey Payload: POST /api/evaluation/sus"]
+    end
+
+    subgraph Pool3 ["Pool 3: API & Orchestrator (Backend - Next.js Node.js Runtime)"]
+        direction TB
+        P3_Mutex["Execution Lock / Queue Manager: Check Active Mutex (engineLock.isBusy)"]
+        P3_Decision{"Is Engine<br/>Busy?"}
+        P3_Acquire["Grant Session Mutex Lock: engineLock.acquire(session_id)"]
+        P3_Timer1["Latency Benchmark Timer (Crawl): Record T_start1 = performance.now()"]
+        P3_YamlBuilder["Dynamic Config Builder: YAML.stringify() via fs.writeFile()"]
+        P3_SpawnCrawl["Subprocess Spawner: spawn('node', ['generator/dist/main.js', 'crawl'])"]
+        P3_SSE["Real-time Stream Controller: Pipe stdout/stderr via Server-Sent Events"]
+        P3_ParseCrawl["Artifact Parser: Read & Validate crawl/<role>.json via Zod Schema"]
+        P3_SpawnGen["Subprocess Spawner: spawn('node', ['generator/dist/main.js', 'generate'])"]
+        P3_ParseManifest["Artifact Parser: Read manifest.json -> Parse ManifestEntry[]"]
+        P3_Timer2["Latency Benchmark Timer (Run): Record T_start2 = performance.now()"]
+        P3_SpawnRun["Subprocess Spawner: spawn('node', ['generator/dist/main.js', 'run', ...])"]
+        P3_CalcMetrics["Process Exit & Benchmark Calculator: ΔTime = T_end2 - T_start2"]
+        P3_Unlock["Release Execution Mutex Lock: engineLock.release() -> Dequeue Next"]
+        P3_SaveSUS["Evaluation Data Logger: Calculate Normalized SUS Score & Log Metrics"]
+    end
+
+    subgraph Pool4 ["Pool 4: Engine Execution (Storage / File System Layer & CLI)"]
+        direction TB
+        P4_YamlFile[("Workspace Configuration:<br/>tathya.config.yaml")]
+        P4_CliCrawl["TathyaTest Core Engine (CLI): runCrawl() -> assertReachable(baseUrl)"]
+        P4_PwCrawl["Playwright Chromium Automation: login() -> BFS Link & Form Traversal"]
+        P4_CrawlJson[("Crawl Snapshot Artifacts:<br/>crawl/<role>.json")]
+        P4_CliGen["Generator Core Modeling: rbac.ts + crud.ts + fieldgen.ts"]
+        P4_EmitFiles[("Synthesized Spec Files:<br/>tests/generated/manifest.json<br/>tests/generated/**/*.spec.ts")]
+        P4_ExecPw["Playwright Test Runner: Execute generated *.spec.ts under Chromium"]
+        P4_ReportOut[("Test Report Artifacts:<br/>playwright-report/ & test-results/")]
+        P4_ResearchData[("Thesis Dataset Storage:<br/>evaluation_metrics.json")]
+    end
+
+    %% Edge Connections Across Pools
+    P1_Start --> P2_Status
+    P2_Status --> P3_Mutex
+    P3_Mutex --> P3_Decision
+    P3_Decision -- "Yes (Busy)" --> P2_Queue
+    P2_Queue -.->|"Poll Wait"| P2_Status
+    P3_Decision -- "No (Idle)" --> P3_Acquire
+    P3_Acquire --> P2_Ready
+    P2_Ready --> P1_Config
+
+    P1_Config --> P2_CrawlBtn
+    P2_CrawlBtn --> P3_Timer1
+    P3_Timer1 --> P3_YamlBuilder
+    P3_YamlBuilder --> P4_YamlFile
+    P3_YamlBuilder --> P3_SpawnCrawl
+    P3_SpawnCrawl --> P4_CliCrawl
+    P4_YamlFile --> P4_CliCrawl
+    P4_CliCrawl --> P4_PwCrawl
+    P4_PwCrawl --> P4_CrawlJson
+    P4_CliCrawl --> P3_SSE
+    P3_SSE --> P2_Console
+    P4_CrawlJson --> P3_ParseCrawl
+    P3_ParseCrawl --> P2_Graph
+    P2_Graph --> P1_ViewGraph
+
+    P1_ViewGraph --> P1_GenClick
+    P1_GenClick --> P2_PostGen
+    P2_PostGen --> P3_SpawnGen
+    P3_SpawnGen --> P4_CliGen
+    P4_CrawlJson --> P4_CliGen
+    P4_CliGen --> P4_EmitFiles
+    P4_EmitFiles --> P3_ParseManifest
+    P3_ParseManifest --> P2_Table
+    P2_Table --> P1_RunClick
+
+    P1_RunClick --> P2_PostRun
+    P2_PostRun --> P3_Timer2
+    P3_Timer2 --> P3_SpawnRun
+    P3_SpawnRun --> P4_ExecPw
+    P4_EmitFiles --> P4_ExecPw
+    P4_ExecPw --> P4_ReportOut
+    P4_ReportOut --> P3_CalcMetrics
+    P3_CalcMetrics --> P3_Unlock
+    P3_CalcMetrics --> P2_Dashboard
+    P2_Dashboard --> P1_ViewReport
+    P2_Dashboard --> P2_ModalSUS
+
+    P2_ModalSUS --> P1_FillSUS
+    P1_FillSUS --> P2_SubmitSUS
+    P2_SubmitSUS --> P3_SaveSUS
+    P3_SaveSUS --> P4_ResearchData
+    P3_SaveSUS --> P1_End
+
+    %% Styling
+    classDef pool1 fill:#F0F9FF,stroke:#0284C7,stroke-width:2px,color:#0369A1;
+    classDef pool2 fill:#EEF2FF,stroke:#4F46E5,stroke-width:2px,color:#3730A3;
+    classDef pool3 fill:#ECFDF5,stroke:#059669,stroke-width:2px,color:#065F46;
+    classDef pool4 fill:#FFFBEB,stroke:#D97706,stroke-width:2px,color:#92400E;
+    classDef storage fill:#FEF3C7,stroke:#B45309,stroke-width:2px,color:#78350F;
+    classDef decision fill:#F3E8FF,stroke:#7C3AED,stroke-width:2px,color:#4C1D95;
+
+    class P4_YamlFile,P4_CrawlJson,P4_EmitFiles,P4_ReportOut,P4_ResearchData storage;
+    class P3_Decision decision;

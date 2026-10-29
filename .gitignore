@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Engine Runtime Artifacts
+engine/crawl/*.json
+!engine/crawl/.gitkeep
+engine/tests/generated/
+engine/storageState/
+engine/generator/dist/
+
+# Test & Playwright outputs
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Environment files & Secrets
+.env
+.env*.local
+*.local
+tathya.config.yaml
+!tathya.config.example.yaml
+!tathya.*.config.example.yaml
+
+# Logs & Debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

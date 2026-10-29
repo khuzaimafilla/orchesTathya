@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" modified="2026-10-29T10:00:00.000Z" agent="Mozilla/5.0" version="24.0.0" type="device">
+  <diagram id="tathyatest-system-flow" name="TathyaTest Orchestrator System Flow">
+    <mxGraphModel dx="2600" dy="2400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="2300" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- pool_1 -->
+        <mxCell id="pool_1" value="POOL 1: OUTPUT FOR USER (Presentation / Evaluation Documents)&#xa;(Actor: Manual / Non-Technical QA Respondent)" style="swimlane;startSize=50;horizontal=1;fillColor=#F0F9FF;strokeColor=#0284C7;fontStyle=1;fontSize=13;fontColor=#0369A1;rounded=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="520" height="2180" as="geometry"/>
+        </mxCell>
+        <!-- pool_2 -->
+        <mxCell id="pool_2" value="POOL 2: CLIENT (Frontend UI - Next.js App Router)&#xa;(Interactive Guided Form, Virtual Console & Visual Dashboards)" style="swimlane;startSize=50;horizontal=1;fillColor=#EEF2FF;strokeColor=#4F46E5;fontStyle=1;fontSize=13;fontColor=#3730A3;rounded=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="600" y="40" width="540" height="2180" as="geometry"/>
+        </mxCell>
+        <!-- pool_3 -->
+        <mxCell id="pool_3" value="POOL 3: API & ORCHESTRATOR (Backend - Next.js Node.js Runtime)&#xa;(Mutex Lock, Latency Benchmark Timer, Config Builder & Subprocess Spawner)" style="swimlane;startSize=50;horizontal=1;fillColor=#ECFDF5;strokeColor=#059669;fontStyle=1;fontSize=13;fontColor=#065F46;rounded=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="40" width="580" height="2180" as="geometry"/>
+        </mxCell>
+        <!-- pool_4 -->
+        <mxCell id="pool_4" value="POOL 4: ENGINE EXECUTION (Storage / File System Layer & CLI)&#xa;(TathyaTest CLI Core, Headless Playwright Chromium & Output Artifacts)" style="swimlane;startSize=50;horizontal=1;fillColor=#FFFBEB;strokeColor=#D97706;fontStyle=1;fontSize=13;fontColor=#92400E;rounded=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="1800" y="40" width="560" height="2180" as="geometry"/>
+        </mxCell>
+        <!-- NODES -->
+        <mxCell id="n_start" value="<b>Start</b><br/>QA Respondent Accesses<br/>Web Orchestrator GUI" style="ellipse;whiteSpace=wrap;html=1;fillColor=#10B981;strokeColor=#059669;fontColor=#FFFFFF;fontStyle=0;fontSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="110" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_status" value="<b>Initial Page Load</b><br/>Poll Engine Availability Status<br/><code>GET /api/orchestrator/status</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="105" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_mutex" value="<b>Execution Lock &amp; Queue Manager</b><br/>Check Mutex Lock State<br/><code>engineLock.isBusy()</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="105" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_decision" value="Is Engine<br/><b>Busy?</b>" style="rhombus;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#7C3AED;fontColor=#4C1D95;fontStyle=0;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="205" width="120" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_queue" value="<b>Waiting Room Component</b><br/>Display: <i>&quot;Engine Busy&quot;</i><br/>Assigned Position #N in Queue (Polling)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontColor=#7F1D1D;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="212" width="240" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_acquire" value="<b>Grant Session Mutex Lock</b><br/><code>engineLock.acquire(session_id)</code><br/>Reserve Workspace &amp; Process Scope" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="320" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_ready" value="<b>Guided Configuration Form</b><br/>Display: <i>&quot;Status: IDLE (Lock Granted)&quot;</i><br/>Enable URL &amp; RBAC Input Fields" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="320" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_u_config" value="<b>Respondent Inputs Target Parameters:</b><br/>• baseUrl: <code>https://target-app.com</code><br/>• loginPath: <code>/login</code><br/>• Roles: <code>admin</code>, <code>user</code> (Credentials)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0369A1;fontColor=#0C4A6E;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="425" width="240" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_crawl_btn" value="<b>Form Submission</b><br/>Respondent clicks <b>&quot;Start Crawl&quot;</b><br/><code>POST /api/orchestrator/crawl</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="430" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_timer1" value="<b>Latency Benchmark Timer (Crawl)</b><br/>Record Start Timestamp:<br/><code>T_start1 = performance.now()</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="430" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_yaml_builder" value="<b>Dynamic Config Builder</b><br/>Translate JSON Payload -> YAML<br/><code>YAML.stringify()</code> via <code>fs.writeFile()</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="535" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_yaml_file" value="<b>Workspace Configuration</b><br/><code>tathya.config.yaml</code><br/>(Validated via Zod <code>configSchema</code>)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="530" width="280" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_spawn_crawl" value="<b>Subprocess Spawner</b><br/><code>child_process.spawn('node',<br/>['generator/dist/main.js', 'crawl'])</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="645" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_cli_crawl" value="<b>TathyaTest Core Engine (CLI)</b><br/><code>runCrawl()</code> -> <code>assertReachable(baseUrl)</code><br/>Preflight HTTP Connectivity Check" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="640" width="280" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_pw_crawl" value="<b>Playwright Chromium Automation</b><br/>• <code>login(page, creds)</code> per RBAC Role<br/>• BFS Graph Crawl (Queue, maxDepth, maxPages)<br/>• Extract DOM: Forms, Inputs, Buttons, Links" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="750" width="280" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_sse" value="<b>SSE Stream Controller</b><br/>Pipe stdout &amp; stderr Chunks<br/><code>Server-Sent Events (/api/stream)</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="760" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_console" value="<b>Virtual Console Component</b><br/>Real-time Streaming Terminal Log Display<br/>(ANSI Colored Logs / xterm.js)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="760" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_crawl_json" value="<b>Crawl Snapshot Artifacts</b><br/><code>crawl/&lt;role&gt;.json</code><br/>(Normalized Page Models &amp; Forms)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="875" width="280" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_parse_crawl" value="<b>Artifact Parser (Crawl AST)</b><br/>Read &amp; Validate via Zod <code>crawlOutputSchema</code><br/>Transform Pages into Node/Edge Graph Model" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="880" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_graph" value="<b>Interactive Graph Visualizer</b><br/>Render DOM Navigation &amp; Form Topology<br/>(React Flow <code>@xyflow/react</code>)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="880" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_u_view_graph" value="<b>User Presentation:</b><br/>Inspect Interactive Site-Map Graph,<br/>Explore Detected Form Constraints &amp; Actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0369A1;fontColor=#0C4A6E;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="880" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_u_gen_click" value="<b>Respondent Configuration:</b><br/>Select Tiers (Positive, Negative, Edge)<br/>Click <b>&quot;Generate Test Scenarios&quot;</b>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0369A1;fontColor=#0C4A6E;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="1000" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_post_gen" value="<b>Trigger Generator Endpoint</b><br/><code>POST /api/orchestrator/generate</code><br/>Flags: <code>--fresh</code>, <code>--read-only</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="1000" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_spawn_gen" value="<b>Subprocess Spawner</b><br/><code>child_process.spawn('node',<br/>['generator/dist/main.js', 'generate'])</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="1000" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_cli_gen" value="<b>Generator Core Modeling (Pure)</b><br/>• <code>rbac.ts</code>: Build Role Access Matrix<br/>• <code>crud.ts</code> + <code>fieldgen.ts</code>: Constraint Tiers<br/>• <code>faker.ts</code> + <code>locator.ts</code> + <code>oracle.ts</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="995" width="280" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_emit_files" value="<b>Synthesized Spec Files &amp; Manifest</b><br/>• <code>tests/generated/manifest.json</code><br/>• <code>tests/generated/auth/login.spec.ts</code><br/>• <code>tests/generated/forms/*.spec.ts</code><br/>• <code>tests/generated/rbac/*.spec.ts</code>" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="1120" width="280" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_parse_manifest" value="<b>Artifact Parser (Manifest)</b><br/>Read <code>manifest.json</code> -> Parse <code>ManifestEntry[]</code><br/>Extract ID, Title, Category, Tier, Mutating" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="1130" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_render_table" value="<b>Test Scenario Catalog Table</b><br/>Render Filterable Suite: Auth, CRUD, RBAC<br/>Selective Checkboxes &amp; Mutation Tags" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="1130" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_u_run_click" value="<b>Respondent Action:</b><br/>Select Specific Test Scenarios<br/>Click <b>&quot;Execute Test Suite&quot;</b>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0369A1;fontColor=#0C4A6E;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="1250" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_post_run" value="<b>Trigger Test Runner Endpoint</b><br/><code>POST /api/orchestrator/run</code><br/>Args: <code>--project &lt;role&gt;-chromium</code>, <code>--grep</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="1250" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_timer2" value="<b>Latency Benchmark Timer (Run)</b><br/>Record Start Timestamp:<br/><code>T_start2 = performance.now()</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="1250" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_spawn_run" value="<b>Subprocess Spawner</b><br/><code>child_process.spawn('node',<br/>['generator/dist/main.js', 'run', ...])</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="1355" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_exec_pw" value="<b>Playwright Test Runner</b><br/>Execute generated <code>*.spec.ts</code> files<br/>under Headless Chromium Instance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="1350" width="280" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_report_out" value="<b>Execution Report Storage</b><br/>• <code>playwright-report/</code> (HTML Report)<br/>• <code>test-results/</code> (Artifact Traces/Screenshots)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="1475" width="280" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_calc_metrics" value="<b>Process Exit &amp; Benchmark Calculator</b><br/>• <code>T_end2 = performance.now()</code><br/>• Latency Overhead: <code>ΔTime = T_end2 - T_start2</code><br/>• Delta Overhead: <code>ΔT_orch - ΔT_cli_raw</code>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="1470" width="280" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_unlock" value="<b>Release Execution Mutex Lock</b><br/><code>engineLock.release()</code><br/>Signal Next Queued Respondent in FIFO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="1595" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_render_dashboard" value="<b>Execution Dashboard Component</b><br/>• Summary: Passed, Failed, Skipped Badges<br/>• Latency Overhead Benchmark Widget (ΔTime)<br/>• Interactive Playwright HTML Report Embed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="1590" width="240" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_u_view_report" value="<b>User Presentation:</b><br/>Review Execution Summary Dashboard,<br/>Inspect Failed Locators &amp; Latency Metric (ΔTime)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0369A1;fontColor=#0C4A6E;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="1590" width="240" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_modal_sus" value="<b>Evaluation Instrument Modal</b><br/>Automatically Trigger Pop-up Modal:<br/><b>System Usability Scale (SUS) Survey</b>" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="1715" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_u_fill_sus" value="<b>Research Evaluation Instrument:</b><br/>Respondent Completes 10 SUS Statements<br/>(1-5 Likert Scale for Usability Study)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0369A1;fontColor=#0C4A6E;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="1715" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_c_submit_sus" value="<b>Submit Evaluation Instrument</b><br/><code>POST /api/evaluation/sus</code><br/>(Payload: SUS Answers + Session Metadata)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#1E1B4B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="1825" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_b_save_sus" value="<b>Evaluation Data Logger</b><br/>Calculate Normalized SUS Score (0-100)<br/>Pair with Latency Benchmark Data (ΔTime)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;fontColor=#064E3B;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="1825" width="280" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_s_research_data" value="<b>Thesis Dataset Storage</b><br/><code>evaluation_metrics.json</code><br/>(SUS Scores &amp; Latency Benchmarks)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FEF3C7;strokeColor=#B45309;fontColor=#78350F;fontSize=11;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="1820" width="280" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_end" value="<b>End</b><br/>Evaluation &amp; Benchmark<br/>Session Complete" style="ellipse;whiteSpace=wrap;html=1;fillColor=#EF4444;strokeColor=#B91C1C;fontColor=#FFFFFF;fontStyle=0;fontSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="1940" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <!-- EDGES -->
+        <mxCell id="e1" value="Open Web App" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_start" target="n_c_status">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="HTTP GET" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_status" target="n_b_mutex">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="Evaluate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_mutex" target="n_b_decision">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" value="Yes (Busy)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_decision" target="n_c_queue">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" value="Poll Waiting Room" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_queue" target="n_c_status">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" value="No (Idle)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_decision" target="n_b_acquire">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" value="Lock Granted" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_acquire" target="n_c_ready">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" value="Display Form" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_ready" target="n_u_config">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" value="Submit Form" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_u_config" target="n_c_crawl_btn">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" value="POST /api/crawl" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_crawl_btn" target="n_b_timer1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" value="T_start1 Set" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_timer1" target="n_b_yaml_builder">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" value="fs.writeFile" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_yaml_builder" target="n_s_yaml_file">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" value="Config Ready" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_yaml_builder" target="n_b_spawn_crawl">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14" value="spawn() CLI" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_spawn_crawl" target="n_s_cli_crawl">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e15" value="Read Config" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_yaml_file" target="n_s_cli_crawl">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e16" value="Launch Browser" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_cli_crawl" target="n_s_pw_crawl">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e17" value="Dump JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_pw_crawl" target="n_s_crawl_json">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e18" value="stdout/stderr" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_cli_crawl" target="n_b_sse">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e19" value="SSE Stream" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_sse" target="n_c_console">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e20" value="Read Output" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_crawl_json" target="n_b_parse_crawl">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e21" value="Graph Payload" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_parse_crawl" target="n_c_graph">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e22" value="Render Graph" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_graph" target="n_u_view_graph">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e23" value="Select Tiers" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_u_view_graph" target="n_u_gen_click">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e24" value="Click Generate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_u_gen_click" target="n_c_post_gen">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e25" value="POST /api/generate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_post_gen" target="n_b_spawn_gen">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e26" value="spawn() CLI" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_spawn_gen" target="n_s_cli_gen">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e27" value="loadCrawls()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_crawl_json" target="n_s_cli_gen">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e28" value="emitTs()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_cli_gen" target="n_s_emit_files">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e29" value="manifest.json" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_emit_files" target="n_b_parse_manifest">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e30" value="Test Scenarios" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_parse_manifest" target="n_c_render_table">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e31" value="Display Table" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_render_table" target="n_u_run_click">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e32" value="Click Execute" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_u_run_click" target="n_c_post_run">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e33" value="POST /api/run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_post_run" target="n_b_timer2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e34" value="T_start2 Set" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_timer2" target="n_b_spawn_run">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e35" value="spawn() Runner" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_spawn_run" target="n_s_exec_pw">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e36" value="Read .spec.ts" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_emit_files" target="n_s_exec_pw">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e37" value="Write Reports" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_exec_pw" target="n_s_report_out">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e38" value="Process Exit" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_s_report_out" target="n_b_calc_metrics">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e39" value="Release Lock" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_calc_metrics" target="n_b_unlock">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e40" value="Metrics & Results" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_calc_metrics" target="n_c_render_dashboard">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e41" value="Display Results" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_render_dashboard" target="n_u_view_report">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e42" value="Trigger Modal" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_render_dashboard" target="n_c_modal_sus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e43" value="Open Pop-up" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_modal_sus" target="n_u_fill_sus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e44" value="Submit Answers" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_u_fill_sus" target="n_c_submit_sus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e45" value="POST /api/sus" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_c_submit_sus" target="n_b_save_sus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e46" value="Append Metrics" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_save_sus" target="n_s_research_data">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e47" value="Complete" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#475569;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n_b_save_sus" target="n_end">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

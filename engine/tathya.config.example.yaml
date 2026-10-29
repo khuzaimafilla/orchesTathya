@@ -1,0 +1,80 @@
+# TathyaTest config reference. Copy to tathya.config.yaml (gitignored — it holds credentials).
+#
+# The smallest working config is the app URL plus one role; every other key below has the
+# default shown and can be omitted:
+#
+#   baseUrl: http://127.0.0.1:8000
+#   auth:
+#     roles:
+#       - { name: admin, username: admin@example.com, password: password }
+
+baseUrl: http://127.0.0.1:8000
+hooks:                  # optional endpoints of the app the generated specs may call
+  reset: { method: POST, path: /__testing/reset }   # reseeds test data before every test; omit or
+                                                    # set `reset: null` for apps without one
+output:
+  dir: tests/generated
+  language: ts          # ts | js
+coverage: all           # positive | negative | edge | all
+oracle:
+  errorSelector: ".invalid-feedback, [role=alert], .text-red-600, x-input-error p"
+auth:
+  loginPath: /login
+  roles:
+    - name: admin
+      username: admin@example.com
+      password: password
+    - name: user
+      username: user@example.com
+      password: password
+crawl:
+  maxDepth: 3
+  maxPages: 100
+  include: []           # extra paths to visit besides what the crawler discovers from the DOM
+  exclude: []           # path prefixes never to visit (e.g. /logout)
+  inferRestRoutes: true # /r/<id>/edit or DELETE /r/<id> ⇒ also visit /r/<id>; off for apps without show pages
+data:
+  fields:               # pinned valid values by field name (otherwise faker generates them)
+    title: Buy groceries
+    body: Milk, eggs, bread
+    contact_email: contact@example.com
+    due_date: "2026-06-15"
+    email: user@example.com
+  defaults:             # fallback valid value by input type
+    text: Sample
+    email: user@example.com
+    number: "1"
+    date: "2026-06-15"
+  unique:               # fields with a server-side unique rule → duplicate-value negatives
+    - contact_email
+  duplicates:           # a value that already exists, used by the duplicate negative
+    contact_email: admin.todo.01@example.com
+  requiredFields: []    # force required-empty negatives for fields the crawl missed
+  confirmFields:        # extra *_confirmation pairs (auto-detected by the _confirmation suffix)
+    - contact_email_confirmation
+  faker:
+    locale: en          # faker locale for generated create/update data
+    seed: null          # set an integer for reproducible data (used by the consistency metric)
+evaluation:             # `tt eval` — metric-based evaluation (writes metrics/report.{json,md})
+  outDir: metrics
+  repeat: 10            # measurement repeats → 95% CI on timing + flake rate
+  manualBaselineSecPerCase: 300   # labelled assumption for the time-savings ratio
+  baselineDir: tests/manual       # hand-written reference suite for the baseline comparison
+  faultProject: null   # restrict fault runs to one browser project (e.g. chromium) for speed
+  # A bare `tt eval` evaluates THIS config as one stack. The stacks below are only used by
+  # `tt eval --stack <name>` / `tt eval --all-stacks` (the cross-stack research study).
+  # `coverage` (pcov | xdebug | none) and `faults` (true | false) are optional: left out, tt eval
+  # probes the app for GET /__testing/coverage and POST /__testing/fault/clear and switches the
+  # corresponding metric families on only when the endpoints answer.
+  stacks:
+    - name: blade
+      dir: .
+      config: tathya.blade.config.yaml
+      baseUrl: http://127.0.0.1:8000
+    - name: inertia
+      dir: .
+      config: tathya.inertia-react.config.yaml
+      baseUrl: http://127.0.0.1:8001
+  faults:
+    enabled: true
+    classes: [validation, authz, crud, pagination, auth]
