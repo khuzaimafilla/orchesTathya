@@ -1,5 +1,21 @@
 [
   {
+    "id": "bench_1793261053572_rdwoc",
+    "step": "run",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml run --workers 1",
+    "startedAt": "2026-10-29T07:57:03.998Z",
+    "endedAt": "2026-10-29T08:04:13.571Z",
+    "durationMs": 429573,
+    "durationSeconds": 429.57,
+    "success": false,
+    "exitCode": 1,
+    "targetUrl": "tathya.config.yaml",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
     "id": "bench_1793258928787_1d4sb",
     "step": "run",
     "cliCommand": "node generator/dist/main.js -c tathya.config.yaml run --workers 1",

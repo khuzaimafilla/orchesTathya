@@ -1,57 +1,22 @@
-# TathyaTest Web Orchestrator
+# orchesTathya
 
-> **Platform Web Orchestrator Berbasis Next.js dan Visualisasi Graf Interaktif untuk Engine Pengujian Otomatis Playwright (TathyaTest CLI)**  
-> *Undergraduate Thesis Project / Proyek Tugas Akhir*
+> **Web Orchestrator & GUI Dashboard untuk TathyaTest CLI Engine**
 
----
-
-## 1. Ringkasan Arsitektur Proyek (Monorepo)
-
-Repositori ini menggabungkan antarmuka visual modern (**Next.js Web Orchestrator**) dengan mesin perayap dan pembuat skenario uji fungsional (**TathyaTest CLI Engine**) ke dalam struktur monorepo yang bersih dan modular:
-
-```text
-.
-├── apps/
-│   └── web/                   # [Frontend & Backend Orchestrator] Next.js (App Router, Tailwind CSS, TypeScript)
-│       ├── src/app/           # API routes (/api/orchestrator/*) & halaman dashboard
-│       ├── src/components/    # Komponen graf (React Flow), Virtual Console, tabel skenario, modal SUS
-│       └── package.json
-│
-├── engine/                    # [Testing Core] TathyaTest CLI & Headless Playwright Chromium Crawler
-│   ├── generator/             # Generator TypeScript CLI (tt)
-│   ├── case-study/            # Target studi kasus pengujian (Laravel Blade & Inertia React)
-│   ├── playwright.config.ts   # Konfigurasi Playwright (termasuk kompatibilitas Windows)
-│   └── package.json
-│
-├── docs/                      # [Dokumentasi Akademis & Perancangan]
-│   ├── diagrams/
-│   │   ├── bpmn-tathyatest-orchestrator.drawio  # BPMN 2.0 Collaboration Diagram
-│   │   ├── system-flow-tathyatest.drawio       # System Flow Diagram (4 Pools)
-│   │   └── system-flow-mermaid.mmd             # Mermaid.js Sequence/Flow
-│   └── research/
-│       ├── sus-instrument.md                   # Instrumen Kuesioner System Usability Scale (SUS)
-│       └── benchmark-methodology.md            # Protokol Pengukuran Latensi Overhead (ΔTime)
-│
-├── .gitignore
-└── README.md
-```
+orchesTathya adalah antarmuka web modern berbasis **Next.js** yang membungkus mesin pengujian otomatis **TathyaTest (Playwright)**. Sistem ini mengubah alur pengujian CLI yang sebelumnya manual (mengedit file YAML) menjadi alur visual yang mudah digunakan: mulai dari memasukkan URL target, memetakan formulir DOM, memilih skenario uji, hingga memantau eksekusi pengujian secara langsung.
 
 ---
 
-## 2. Cara Menjalankan Proyek Secara Lokal
+## 🚀 Cara Menjalankan Sistem
 
-### Prasyarat
-- **Node.js** >= v20.0.0
-- **npm** >= v10.0.0
-- **Browser Playwright Chromium**:
-  ```bash
-  npx playwright install chromium
-  ```
+### 1. Prasyarat
+- **Node.js** (versi 20 atau lebih baru)
+- **npm** (versi 10 atau lebih baru)
+- **Git**
 
----
-
-### Langkah 1: Build Engine CLI (`engine/`)
+### 2. Setup Engine (Sekali Saja)
+Buka terminal di folder root repositori:
 ```bash
+# Masuk ke folder engine dan build generator CLI
 cd engine
 npm install
 cd generator
@@ -59,35 +24,60 @@ npm install
 npm run build
 npm link
 cd ../..
+
+# Pasang browser Chromium Playwright
+npx playwright install chromium
 ```
-*Perintah `tt --version` sekarang dapat dijalankan di terminal Anda.*
 
----
-
-### Langkah 2: Jalankan Web Orchestrator Next.js (`apps/web/`)
-Buka terminal baru:
+### 3. Jalankan Web Orchestrator
 ```bash
 cd apps/web
+npm install
 npm run dev
 ```
-Buka browser di: **`http://localhost:3000`**
 
 ---
 
-## 3. Fitur Utama Web Orchestrator
+## 📖 Panduan Penggunaan (Alur 4 Langkah)
 
-1. **No-Code Configuration Wizard**: Pengguna cukup menginputkan URL website dan akun login tanpa perlu menyusun file YAML secara manual.
-2. **Interactive DOM Site-Map (React Flow)**: Mengubah snapshot `crawl/<role>.json` menjadi topologi graf interaktif.
-3. **Execution Lock & Queue Manager**: Mencegah tabrakan sesi saat beberapa responden penelitian mengakses sistem secara bersamaan.
-4. **Virtual Terminal Console**: Streaming *real-time* log `stdout/stderr` subprocess Playwright ke browser via *Server-Sent Events (SSE)*.
-5. **Research Evaluation Module**:
-   - Pencatatan latensi *overhead* presisi: $\Delta \text{Time} = T_{\text{end}} - T_{\text{start}}$.
-   - Pop-up modal evaluasi **System Usability Scale (SUS)** dengan 10 pernyataan standar.
+Sistem dirancang dengan alur pengujian yang terstruktur dalam 4 langkah:
+
+### 1. Konfigurasi Target (Tahap 1)
+- Masukkan URL aplikasi web yang ingin diuji, rute login, dan kredensial akun.
+- **Tip Praktis**: Anda dapat langsung mengklik tombol **"SauceDemo SPA (Preset)"** untuk mencoba pengujian instan pada aplikasi e-commerce publik SauceDemo.
+- Klik tombol **"Simpan Konfigurasi & Mulai Crawl Engine"**. Crawler Playwright akan mulai menjelajahi halaman web target di latar belakang.
+
+### 2. Struktur Sitemap & Form (Tahap 2)
+- Setelah crawling selesai, halaman ini akan menampilkan daftar seluruh halaman web yang berhasil ditemukan.
+- Anda dapat menginspeksi formulir HTML (CRUD), tombol interaktif, serta rincian kolom input (tipe data, aturan validasi, dan selector elemen).
+- Klik tombol **"Lanjut: Generate Test Specs"** untuk membuat skenario uji otomatis.
+
+### 3. Matriks Skenario Uji (Tahap 3)
+- Generator akan menghasilkan skenario pengujian fungsional Playwright (misal: 31 skenario pada SauceDemo).
+- Anda dapat menyaring skenario berdasarkan:
+  - **Kategori**: Auth (Login/Logout), CRUD (Formulir), RBAC (Peran Akun), atau Navigasi.
+  - **Tier**: Skenario positif (data valid), negatif (input salah/kosong), atau nilai batas (*edge cases*).
+- Anda dapat menjalankan seluruh skenario sekaligus, hanya skenario `@positive`, atau memilih skenario tertentu secara spesifik.
+
+### 4. Eksekusi Pengujian & Hasil (Tahap 4)
+- Playwright Chromium akan mengeksekusi skenario uji secara otomatis.
+- **Virtual Console**: Kotak terminal di bagian bawah layar menampilkan streaming log eksekusi secara *real-time*.
+- Setelah eksekusi selesai, kartu ringkasan akan menampilkan jumlah tes yang **Passed** (Lulus), **Failed** (Gagal), **Skipped** (Dilewati), dan total durasi waktu eksekusi.
+- Responden dapat melengkapi survei evaluasi singkat usabilitas (SUS) yang terbuka otomatis di akhir pengujian.
 
 ---
 
-## 4. Diagram Perancangan Sistem
+## 📁 Struktur Folder Utama
 
-Diagram arsitektur sistem formal dapat dilihat dan diedit menggunakan [Draw.io / diagrams.net](https://app.diagrams.net):
-- BPMN 2.0 Collaboration: [`docs/diagrams/bpmn-tathyatest-orchestrator.drawio`](docs/diagrams/bpmn-tathyatest-orchestrator.drawio)
-- System Flow 4-Pool: [`docs/diagrams/system-flow-tathyatest.drawio`](docs/diagrams/system-flow-tathyatest.drawio)
+```text
+orchesTathya/
+├── apps/
+│   └── web/          # Aplikasi Web Orchestrator (Next.js, Tailwind CSS)
+│       ├── src/      # Komponen UI, halaman dashboard, dan API controller
+│       └── data/     # Penyimpanan log riwayat eksekusi dan kuesioner
+│
+├── engine/           # Inti pengujian TathyaTest CLI (Playwright Crawler & Generator)
+│   └── generator/    # Source code TypeScript CLI (tt)
+│
+└── README.md
+```
