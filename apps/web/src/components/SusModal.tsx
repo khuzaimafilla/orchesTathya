@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, ShieldCheck, CheckCircle2, Award, Sparkles, Send } from 'lucide-react';
+import { X, ShieldCheck, Award, Send } from 'lucide-react';
 
 interface SusModalProps {
   isOpen: boolean;
@@ -84,23 +84,23 @@ export function SusModal({ isOpen, onClose, onSubmitted }: SusModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl my-8">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-[#09090b] border border-[#27272a] rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl my-8">
         {/* Header */}
-        <div className="p-5 bg-gradient-to-r from-violet-950/60 to-zinc-900 border-b border-zinc-800 flex items-center justify-between">
+        <div className="p-5 bg-[#121214] border-b border-[#27272a] flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-xl bg-violet-600/20 text-violet-400 border border-violet-500/30">
+            <div className="w-10 h-10 rounded-xl bg-[#18181b] border border-[#EAB308]/40 flex items-center justify-center text-[#EAB308]">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-zinc-100">Kuesioner System Usability Scale (SUS)</h3>
-              <p className="text-xs text-zinc-400">Instrumen Evaluasi Usabilitas Skripsi (Brooke, 1996)</p>
+              <h3 className="font-heading text-sm font-bold text-[#F5F5F0]">Kuesioner System Usability Scale (SUS)</h3>
+              <p className="font-sans text-xs text-[#A1A19D]">Instrumen Evaluasi Usabilitas Skripsi (Brooke, 1996)</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+            className="p-1.5 rounded-lg text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#18181b] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -109,59 +109,63 @@ export function SusModal({ isOpen, onClose, onSubmitted }: SusModalProps) {
         {submittedResult ? (
           /* Submission Success View */
           <div className="p-8 text-center space-y-6">
-            <div className="w-16 h-16 rounded-3xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-400 flex items-center justify-center mx-auto">
+            <div className="w-16 h-16 rounded-3xl bg-[#121214] border border-[#EAB308]/50 text-[#EAB308] flex items-center justify-center mx-auto shadow-lg shadow-[#EAB308]/10">
               <Award className="w-8 h-8" />
             </div>
 
             <div className="space-y-2">
-              <h4 className="text-lg font-bold text-zinc-100">Terima Kasih Atas Partisipasi Anda!</h4>
-              <p className="text-xs text-zinc-400 max-w-md mx-auto">
+              <h4 className="font-heading text-lg font-bold text-[#F5F5F0]">Terima Kasih Atas Partisipasi Anda!</h4>
+              <p className="font-sans text-xs text-[#A1A19D] max-w-md mx-auto">
                 Evaluasi Anda berhasil direkam ke dalam dataset penelitian skripsi.
               </p>
             </div>
 
-            <div className="p-6 rounded-xl bg-zinc-900/60 border border-zinc-800 max-w-sm mx-auto space-y-3">
-              <div className="text-3xl font-extrabold text-indigo-400">{submittedResult.susScore} / 100</div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
-                Grade: {submittedResult.grade}
+            <div className="p-6 rounded-xl bg-[#121214] border border-[#27272a] max-w-sm mx-auto space-y-3">
+              <div className="font-heading text-4xl font-extrabold text-[#EAB308]">{submittedResult.susScore} / 100</div>
+              <div className="font-heading text-xs font-semibold uppercase tracking-wider text-[#F5F5F0]">
+                Predikat: {submittedResult.grade}
               </div>
-              <div className="text-[11px] text-zinc-400 font-mono">
+              <div className="text-[11px] text-[#A1A19D] font-mono">
                 Acceptability: {submittedResult.acceptability}
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition-all"
+              className="px-6 py-2.5 rounded-xl bg-[#EAB308] hover:bg-[#FACC15] text-black font-heading text-xs font-bold shadow-md shadow-[#EAB308]/20 transition-all"
             >
               Tutup Modal
             </button>
           </div>
         ) : (
           /* Questionnaire Form */
-          <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto font-sans">
             {/* Respondent Profile */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-[#121214] border border-[#27272a]">
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">Nama / Inisial Responden</label>
+                <label className="block text-xs font-medium text-[#F5F5F0] mb-1 font-heading">
+                  Nama / Inisial Responden
+                </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Contoh: John Doe / Tester 1"
-                  className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500"
+                  placeholder="Contoh: Budi Santoso / Tester 1"
+                  className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] focus:outline-none focus:border-[#EAB308] font-sans"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">Peran / Latar Belakang</label>
+                <label className="block text-xs font-medium text-[#F5F5F0] mb-1 font-heading">
+                  Peran / Latar Belakang
+                </label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] focus:outline-none focus:border-[#EAB308] font-sans"
                 >
-                  <option value="QA Engineer">QA Engineer / Tester</option>
+                  <option value="QA Engineer">QA Engineer / Software Tester</option>
                   <option value="Software Developer">Software Developer / Programmer</option>
                   <option value="Mahasiswa TI">Mahasiswa Teknik Informatika / SI</option>
                   <option value="Dosen / Akademisi">Dosen / Peneliti</option>
@@ -171,10 +175,10 @@ export function SusModal({ isOpen, onClose, onSubmitted }: SusModalProps) {
             </div>
 
             {/* Questions Table */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-zinc-400 pb-1 border-b border-zinc-800">
-                <span>Pernyataan Evaluasi</span>
-                <span className="font-mono text-[11px]">1 (Sangat Tidak Setuju) s.d. 5 (Sangat Setuju)</span>
+            <div className="space-y-3.5">
+              <div className="flex items-center justify-between text-xs text-[#A1A19D] pb-1 border-b border-[#27272a] font-sans">
+                <span>Pernyataan Evaluasi Usabilitas</span>
+                <span className="font-mono text-[11px] text-[#EAB308]">Skala 1 (Sangat Tidak Setuju) s.d. 5 (Sangat Setuju)</span>
               </div>
 
               {SUS_QUESTIONS.map((q) => {
@@ -182,17 +186,17 @@ export function SusModal({ isOpen, onClose, onSubmitted }: SusModalProps) {
                 return (
                   <div
                     key={q.id}
-                    className="p-3.5 rounded-xl bg-zinc-900/30 border border-zinc-800/60 hover:border-zinc-700 transition-colors space-y-2.5"
+                    className="p-3.5 rounded-xl bg-[#121214] border border-[#27272a] hover:border-[#3f3f46] transition-colors space-y-2.5"
                   >
                     <div className="flex items-start justify-between gap-4">
-                      <div className="text-xs font-medium text-zinc-200">
-                        <span className="text-indigo-400 font-mono font-bold mr-2">{q.id}.</span>
+                      <div className="text-xs font-medium text-[#F5F5F0] leading-relaxed">
+                        <span className="text-[#EAB308] font-heading font-bold mr-2">{q.id}.</span>
                         {q.text}
-                        <div className="text-[10px] text-zinc-500 italic mt-0.5">{q.en}</div>
+                        <div className="text-[10px] text-[#71717A] italic mt-0.5">{q.en}</div>
                       </div>
 
                       {/* Likert Buttons 1 to 5 */}
-                      <div className="flex items-center space-x-1 shrink-0">
+                      <div className="flex items-center space-x-1.5 shrink-0">
                         {[1, 2, 3, 4, 5].map((val) => {
                           const isSelected = currentVal === val;
                           return (
@@ -200,10 +204,10 @@ export function SusModal({ isOpen, onClose, onSubmitted }: SusModalProps) {
                               key={val}
                               type="button"
                               onClick={() => handleSelectScore(q.id, val)}
-                              className={`w-7 h-7 rounded-lg text-xs font-mono font-semibold transition-all ${
+                              className={`w-7 h-7 rounded-lg text-xs font-mono font-bold transition-all ${
                                 isSelected
-                                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-105'
-                                  : 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+                                  ? 'bg-[#EAB308] text-black shadow-sm scale-105'
+                                  : 'bg-[#09090b] text-[#A1A19D] border border-[#27272a] hover:text-[#F5F5F0] hover:border-[#3f3f46]'
                               }`}
                             >
                               {val}
@@ -217,33 +221,33 @@ export function SusModal({ isOpen, onClose, onSubmitted }: SusModalProps) {
               })}
             </div>
 
-            {/* Feedback Note */}
+            {/* Qualitative Feedback */}
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1">
-                Kritik, Saran, atau Masukan Kualitatif (Opsional)
+              <label className="block text-xs font-medium text-[#F5F5F0] mb-1 font-heading">
+                Masukan / Kritik & Saran Kualitatif (Opsional)
               </label>
               <textarea
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                placeholder="Tuliskan masukan untuk peningkatan Web Orchestrator..."
+                placeholder="Tuliskan pengalaman atau kendala yang dihadapi saat pengujian..."
                 rows={2}
-                className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] placeholder-[#71717A] focus:outline-none focus:border-[#EAB308] font-sans"
               />
             </div>
 
             {/* Score Preview & Submit */}
-            <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
-              <div className="text-xs text-zinc-400">
-                Skor SUS Terkalkulasi:{' '}
-                <span className="font-bold font-mono text-indigo-400 text-sm ml-1">{currentScore}</span>
-                <span className="text-[10px] text-zinc-500 ml-1">/ 100</span>
+            <div className="flex items-center justify-between pt-4 border-t border-[#27272a]">
+              <div className="text-xs text-[#A1A19D] font-sans">
+                Estimasi Skor SUS:{' '}
+                <span className="font-heading font-bold text-[#EAB308] text-base ml-1">{currentScore}</span>
+                <span className="text-[10px] text-[#71717A] ml-1">/ 100</span>
               </div>
 
               <div className="flex items-center space-x-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors"
+                  className="px-4 py-2 rounded-xl text-xs font-heading font-medium text-[#A1A19D] hover:text-[#F5F5F0] transition-colors"
                 >
                   Batal
                 </button>
@@ -251,10 +255,10 @@ export function SusModal({ isOpen, onClose, onSubmitted }: SusModalProps) {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center space-x-2 transition-all hover:scale-[1.02]"
+                  className="px-6 py-2.5 rounded-xl bg-[#EAB308] hover:bg-[#FACC15] text-black font-heading text-xs font-bold shadow-md shadow-[#EAB308]/20 flex items-center space-x-2 transition-all hover:scale-[1.02]"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>{isSubmitting ? 'Mengirim...' : 'Kirim Respon Evaluasi'}</span>
+                  <Send className="w-3.5 h-3.5 text-black" />
+                  <span>{isSubmitting ? 'Mengirim...' : 'Kirim Evaluasi SUS'}</span>
                 </button>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { TargetConfigInput, SAUCEDEMO_PRESET } from '@/lib/config-builder';
-import { Globe, Key, Compass, Play, Sparkles, RefreshCw, Layers } from 'lucide-react';
+import { Globe, Compass, Play, RefreshCw, BookmarkCheck } from 'lucide-react';
 
 interface ConfigWizardProps {
   onStartCrawl: (config: TargetConfigInput) => void;
@@ -46,15 +46,15 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
   return (
     <div className="space-y-6">
       {/* Preset Banner */}
-      <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-zinc-900 border border-indigo-900/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-4 rounded-xl bg-[#121214] border border-[#27272a] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
-          <div className="p-2.5 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
-            <Sparkles className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-[#18181b] border border-[#EAB308]/30 flex items-center justify-center text-[#EAB308]">
+            <BookmarkCheck className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-zinc-100">Evaluasi Target Web Aplikasi</h3>
-            <p className="text-xs text-zinc-400">
-              Pilih preset evaluasi SauceDemo (React SPA Publik) atau konfigurasi URL target custom Anda.
+            <h3 className="font-heading font-semibold text-sm text-[#F5F5F0]">Pilih Preset Target Uji (SUT)</h3>
+            <p className="font-sans text-xs text-[#A1A19D]">
+              Gunakan preset SauceDemo (React SPA e-commerce publik) untuk demonstrasi instan atau masukkan URL target custom.
             </p>
           </div>
         </div>
@@ -63,10 +63,10 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
           <button
             type="button"
             onClick={() => handleApplyPreset('saucedemo')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-semibold transition-all ${
               presetType === 'saucedemo'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
+                ? 'bg-[#EAB308] text-black shadow-sm'
+                : 'bg-[#18181b] text-[#A1A19D] hover:text-[#F5F5F0] border border-[#27272a]'
             }`}
           >
             SauceDemo SPA (Preset)
@@ -74,13 +74,13 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
           <button
             type="button"
             onClick={() => handleApplyPreset('custom')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-semibold transition-all ${
               presetType === 'custom'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
+                ? 'bg-[#EAB308] text-black shadow-sm'
+                : 'bg-[#18181b] text-[#A1A19D] hover:text-[#F5F5F0] border border-[#27272a]'
             }`}
           >
-            Custom SUT
+            Custom Target
           </button>
         </div>
       </div>
@@ -88,42 +88,42 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Card 1: Target App & Authentication */}
-          <div className="p-5 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-4">
-            <div className="flex items-center space-x-2 border-b border-zinc-800 pb-3">
-              <Globe className="w-4 h-4 text-cyan-400" />
-              <h4 className="text-xs font-semibold text-zinc-200 uppercase tracking-wider">
-                1. Target URL & Autentikasi
+          <div className="p-5 rounded-xl bg-[#121214] border border-[#27272a] space-y-4">
+            <div className="flex items-center space-x-2 border-b border-[#27272a] pb-3">
+              <Globe className="w-4 h-4 text-[#EAB308]" />
+              <h4 className="font-heading text-xs font-semibold text-[#F5F5F0] uppercase tracking-wider">
+                1. Target URL & Kredensial Login
               </h4>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 font-sans">
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1">Base URL (SUT)</label>
+                <label className="block text-xs font-medium text-[#A1A19D] mb-1">Base URL (SUT)</label>
                 <input
                   type="url"
                   required
                   value={config.baseUrl}
                   onChange={(e) => setConfig({ ...config, baseUrl: e.target.value })}
                   placeholder="https://example.com"
-                  className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 font-mono"
+                  className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] placeholder-[#71717A] focus:outline-none focus:border-[#EAB308] font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1">Login Path</label>
+                <label className="block text-xs font-medium text-[#A1A19D] mb-1">Login Path</label>
                 <input
                   type="text"
                   required
                   value={config.loginPath}
                   onChange={(e) => setConfig({ ...config, loginPath: e.target.value })}
                   placeholder="/"
-                  className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 font-mono"
+                  className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] placeholder-[#71717A] focus:outline-none focus:border-[#EAB308] font-mono"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Role Name</label>
+                  <label className="block text-xs font-medium text-[#A1A19D] mb-1">Nama Role</label>
                   <input
                     type="text"
                     required
@@ -132,11 +132,11 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                       setConfig({ ...config, role: { ...config.role, name: e.target.value } })
                     }
                     placeholder="standard_user"
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                    className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Username</label>
+                  <label className="block text-xs font-medium text-[#A1A19D] mb-1">Username</label>
                   <input
                     type="text"
                     required
@@ -145,11 +145,11 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                       setConfig({ ...config, role: { ...config.role, username: e.target.value } })
                     }
                     placeholder="username"
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                    className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Password</label>
+                  <label className="block text-xs font-medium text-[#A1A19D] mb-1">Password</label>
                   <input
                     type="password"
                     required
@@ -158,7 +158,7 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                       setConfig({ ...config, role: { ...config.role, password: e.target.value } })
                     }
                     placeholder="password"
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                    className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] font-mono"
                   />
                 </div>
               </div>
@@ -166,18 +166,18 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
           </div>
 
           {/* Card 2: Crawler & Extraction Constraints */}
-          <div className="p-5 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-4">
-            <div className="flex items-center space-x-2 border-b border-zinc-800 pb-3">
-              <Compass className="w-4 h-4 text-violet-400" />
-              <h4 className="text-xs font-semibold text-zinc-200 uppercase tracking-wider">
-                2. Crawler Scope & Oracle
+          <div className="p-5 rounded-xl bg-[#121214] border border-[#27272a] space-y-4">
+            <div className="flex items-center space-x-2 border-b border-[#27272a] pb-3">
+              <Compass className="w-4 h-4 text-[#EAB308]" />
+              <h4 className="font-heading text-xs font-semibold text-[#F5F5F0] uppercase tracking-wider">
+                2. Batasan Crawler & Oracle Error
               </h4>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 font-sans">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Max Depth</label>
+                  <label className="block text-xs font-medium text-[#A1A19D] mb-1">Kedalaman Max (Depth)</label>
                   <input
                     type="number"
                     min="1"
@@ -189,12 +189,12 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                         crawl: { ...config.crawl, maxDepth: parseInt(e.target.value) || 1 },
                       })
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                    className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Max Pages</label>
+                  <label className="block text-xs font-medium text-[#A1A19D] mb-1">Halaman Max (Pages)</label>
                   <input
                     type="number"
                     min="1"
@@ -206,14 +206,14 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                         crawl: { ...config.crawl, maxPages: parseInt(e.target.value) || 10 },
                       })
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                    className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1">
-                  Include Routes (Pisahkan koma)
+                <label className="block text-xs font-medium text-[#A1A19D] mb-1">
+                  Rute yang Disertakan (Pisahkan koma)
                 </label>
                 <input
                   type="text"
@@ -228,12 +228,12 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                     })
                   }
                   placeholder="/inventory.html, /cart.html"
-                  className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                  className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1">
+                <label className="block text-xs font-medium text-[#A1A19D] mb-1">
                   Oracle Error Selector (CSS)
                 </label>
                 <input
@@ -241,7 +241,7 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                   value={config.oracleErrorSelector || ''}
                   onChange={(e) => setConfig({ ...config, oracleErrorSelector: e.target.value })}
                   placeholder='[data-test="error"]'
-                  className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                  className="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-[#27272a] text-xs text-[#F5F5F0] font-mono"
                 />
               </div>
             </div>
@@ -253,20 +253,20 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
           <button
             type="submit"
             disabled={isLoading || isLocked}
-            className={`px-6 py-2.5 rounded-xl font-semibold text-xs flex items-center space-x-2 shadow-lg transition-all ${
+            className={`px-6 py-2.5 rounded-xl text-xs font-heading font-bold flex items-center space-x-2 transition-all ${
               isLoading || isLocked
-                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-cyan-600 via-indigo-600 to-violet-600 hover:from-cyan-500 hover:to-violet-500 text-white shadow-indigo-600/30 hover:scale-[1.01] active:scale-[0.99]'
+                ? 'bg-[#18181b] text-[#71717A] border border-[#27272a] cursor-not-allowed'
+                : 'bg-[#EAB308] hover:bg-[#FACC15] text-black shadow-md shadow-[#EAB308]/20 hover:scale-[1.01] active:scale-[0.99]'
             }`}
           >
             {isLoading ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
+                <RefreshCw className="w-4 h-4 animate-spin text-black" />
                 <span>Sedang Melakukan Crawling & Ekstraksi...</span>
               </>
             ) : (
               <>
-                <Play className="w-4 h-4 fill-white" />
+                <Play className="w-4 h-4 fill-black" />
                 <span>Simpan Konfigurasi & Mulai Crawl Engine</span>
               </>
             )}

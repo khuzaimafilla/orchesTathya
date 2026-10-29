@@ -1,107 +1,105 @@
 'use client';
 
 import React from 'react';
-import { ShieldCheck, Terminal, Cpu, Activity, BarChart2, CheckCircle2, Lock, Unlock } from 'lucide-react';
+import { Cpu, Lock, Unlock, ShieldCheck } from 'lucide-react';
 import { LockState } from '@/lib/lock-manager';
 
 interface NavbarProps {
-  activeTab: 'config' | 'sitemap' | 'manifest' | 'runner' | 'benchmarks';
-  setActiveTab: (tab: 'config' | 'sitemap' | 'manifest' | 'runner' | 'benchmarks') => void;
+  activeTab: 'config' | 'sitemap' | 'manifest' | 'runner';
+  setActiveTab: (tab: 'config' | 'sitemap' | 'manifest' | 'runner') => void;
   lockState: LockState | null;
   onOpenSus: () => void;
+  isWorkflowCompleted: boolean;
 }
 
-export function Navbar({ activeTab, setActiveTab, lockState, onOpenSus }: NavbarProps) {
+export function Navbar({
+  activeTab,
+  setActiveTab,
+  lockState,
+  onOpenSus,
+  isWorkflowCompleted,
+}: NavbarProps) {
   const isLocked = lockState?.isLocked ?? false;
 
   return (
-    <header className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50">
+    <header className="border-b border-[#27272a] bg-[#09090b]/95 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Cpu className="w-5 h-5 text-white" />
+        <div className="flex items-center space-x-3.5">
+          <div className="w-9 h-9 rounded-xl bg-[#121214] border border-[#EAB308]/40 flex items-center justify-center shadow-md shadow-[#EAB308]/10">
+            <Cpu className="w-5 h-5 text-[#EAB308]" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-bold text-lg tracking-tight text-zinc-100">orchesTathya</span>
-              <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/60">
-                Web Orchestrator
+              <span className="font-heading font-bold text-base tracking-tight text-[#F5F5F0]">
+                orchesTathya
+              </span>
+              <span className="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider rounded-md bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/30">
+                CLI Orchestrator
               </span>
             </div>
-            <p className="text-xs text-zinc-400 font-mono">TathyaTest CLI GUI & Benchmark Suite</p>
+            <p className="text-[11px] text-[#A1A19D] font-sans">
+              Pengujian Otomatis SUT & Evaluasi Usabilitas
+            </p>
           </div>
         </div>
 
         {/* Step Navigation Tabs */}
-        <nav className="hidden md:flex items-center space-x-1 bg-zinc-900/90 p-1 rounded-xl border border-zinc-800">
+        <nav className="hidden md:flex items-center space-x-1 bg-[#121214] p-1 rounded-xl border border-[#27272a]">
           <button
             onClick={() => setActiveTab('config')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center space-x-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-medium transition-all ${
               activeTab === 'config'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
+                ? 'bg-[#EAB308] text-black font-semibold shadow-sm'
+                : 'text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#1a1a1e]'
             }`}
           >
-            <span>1. Target Config</span>
+            1. Konfigurasi SUT
           </button>
 
           <button
             onClick={() => setActiveTab('sitemap')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center space-x-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-medium transition-all ${
               activeTab === 'sitemap'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
+                ? 'bg-[#EAB308] text-black font-semibold shadow-sm'
+                : 'text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#1a1a1e]'
             }`}
           >
-            <span>2. Sitemap Graph</span>
+            2. Struktur Sitemap
           </button>
 
           <button
             onClick={() => setActiveTab('manifest')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center space-x-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-medium transition-all ${
               activeTab === 'manifest'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
+                ? 'bg-[#EAB308] text-black font-semibold shadow-sm'
+                : 'text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#1a1a1e]'
             }`}
           >
-            <span>3. Test Matrix</span>
+            3. Matriks Skenario
           </button>
 
           <button
             onClick={() => setActiveTab('runner')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center space-x-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-medium transition-all ${
               activeTab === 'runner'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
+                ? 'bg-[#EAB308] text-black font-semibold shadow-sm'
+                : 'text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#1a1a1e]'
             }`}
           >
-            <span>4. Test Execution</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('benchmarks')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center space-x-1.5 ${
-              activeTab === 'benchmarks'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
-            }`}
-          >
-            <BarChart2 className="w-3.5 h-3.5" />
-            <span>5. Research Metrics</span>
+            4. Eksekusi Pengujian
           </button>
         </nav>
 
-        {/* Status & SUS Action */}
+        {/* Right Section: Engine Lock & Gated SUS Action */}
         <div className="flex items-center space-x-3">
-          {/* Mutex Lock Status */}
+          {/* Engine Lock Status */}
           <div
-            className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-mono border ${
+            className={`hidden sm:flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-mono border ${
               isLocked
-                ? 'bg-amber-950/60 text-amber-300 border-amber-800/60 animate-pulse'
-                : 'bg-emerald-950/60 text-emerald-300 border-emerald-800/60'
+                ? 'bg-amber-950/40 text-amber-300 border-amber-800/60'
+                : 'bg-[#121214] text-emerald-400 border-emerald-900/40'
             }`}
-            title={isLocked ? `Engine busy on [${lockState?.activeStep}]` : 'Engine lock free'}
           >
             {isLocked ? (
               <>
@@ -116,14 +114,25 @@ export function Navbar({ activeTab, setActiveTab, lockState, onOpenSus }: Navbar
             )}
           </div>
 
-          {/* SUS Survey Button */}
-          <button
-            onClick={onOpenSus}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Isi Kuesioner SUS</span>
-          </button>
+          {/* Gated SUS Survey Button: Enabled only if user completed the workflow */}
+          {isWorkflowCompleted ? (
+            <button
+              onClick={onOpenSus}
+              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-[#EAB308] hover:bg-[#FACC15] text-black text-xs font-heading font-bold shadow-md shadow-[#EAB308]/20 transition-all hover:scale-[1.02] active:scale-[0.98] animate-bounce"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-black" />
+              <span>Isi Kuesioner SUS</span>
+            </button>
+          ) : (
+            <button
+              disabled
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#18181b] text-[#71717A] border border-[#27272a] text-xs font-heading font-medium cursor-not-allowed opacity-80"
+              title="Selesaikan alur pengujian (Crawl -> Generate -> Run) untuk membuka kuesioner usabilitas"
+            >
+              <Lock className="w-3 h-3" />
+              <span>Kuesioner SUS (Terkunci)</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

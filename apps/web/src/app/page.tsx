@@ -8,37 +8,47 @@ import { ManifestExplorer } from '@/components/ManifestExplorer';
 import { ExecutionDashboard } from '@/components/ExecutionDashboard';
 import { VirtualConsole } from '@/components/VirtualConsole';
 import { SusModal } from '@/components/SusModal';
-import { TargetConfigInput, SAUCEDEMO_PRESET } from '@/lib/config-builder';
+import { TargetConfigInput } from '@/lib/config-builder';
 import { LockState } from '@/lib/lock-manager';
-import { BenchmarkRecord } from '@/lib/benchmark-timer';
-import { Cpu, Terminal, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'config' | 'sitemap' | 'manifest' | 'runner' | 'benchmarks'>('config');
+  const [activeTab, setActiveTab] = useState<'config' | 'sitemap' | 'manifest' | 'runner'>('config');
   const [lockState, setLockState] = useState<LockState | null>(null);
   const [logs, setLogs] = useState<string>('');
   const [crawlData, setCrawlData] = useState<any>(null);
   const [manifest, setManifest] = useState<any[] | null>(null);
-  const [benchmarks, setBenchmarks] = useState<BenchmarkRecord[]>([]);
   const [executionStats, setExecutionStats] = useState<any>(null);
   const [executionDuration, setExecutionDuration] = useState<number>(0);
+
+  // Workflow progress gatekeepers
+  const [hasCrawled, setHasCrawled] = useState<boolean>(false);
+  const [hasGenerated, setHasGenerated] = useState<boolean>(false);
+  const [hasRun, setHasRun] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSusOpen, setIsSusOpen] = useState<boolean>(false);
 
-  // Poll engine status and artifacts on load
+  // Status check & load previous artifacts
   const refreshStatus = async () => {
     try {
       const res = await fetch('/api/orchestrator/status');
       const data = await res.json();
       setLockState(data.lock);
 
-      // Load artifacts if available
       const artRes = await fetch('/api/orchestrator/artifacts');
       const artData = await artRes.json();
-      if (artData.crawlData) setCrawlData(artData.crawlData);
-      if (artData.manifest) setManifest(artData.manifest);
-      if (artData.benchmarks) setBenchmarks(artData.benchmarks);
+      if (artData.crawlData) {
+        setCrawlData(artData.crawlData);
+        setHasCrawled(true);
+      }
+      if (artData.manifest) {
+        setManifest(artData.manifest);
+        setHasGenerated(true);
+      }
+      if (artData.benchmarks) {
+        const hasRunBench = artData.benchmarks.some((b: any) => b.step === 'run' && b.success);
+        if (hasRunBench) setHasRun(true);
+      }
     } catch (e) {
       console.error('Failed to fetch status', e);
     }
@@ -50,10 +60,12 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  const isWorkflowCompleted = hasCrawled && hasGenerated && hasRun;
+
   // Step 1: Start Crawl
   const handleStartCrawl = async (config: TargetConfigInput) => {
     setIsLoading(true);
-    setLogs((prev) => `${prev}\n\n[ORCHESTRATOR] === Starting Crawl & SUT Model Extraction ===\nTarget URL: ${config.baseUrl}\n`);
+    setLogs((prev) => `${prev}\n\n[ORCHESTRATOR] === Memulai Crawl & Ekstraksi Model SUT ===\nTarget URL: ${config.baseUrl}\n`);
 
     try {
       const res = await fetch('/api/orchestrator/crawl', {
@@ -69,13 +81,14 @@ export default function Home() {
 
       if (data.success && data.crawlData) {
         setCrawlData(data.crawlData);
-        setLogs((prev) => `${prev}\n[ORCHESTRATOR] Crawl completed successfully in ${data.durationSeconds}s! Discovered ${data.crawlData.pages?.length || 0} pages.`);
-        setActiveTab('sitemap'); // Auto-advance to step 2
+        setHasCrawled(true);
+        setLogs((prev) => `${prev}\n[ORCHESTRATOR] Crawl sukses dalam ${data.durationSeconds}s! Ditemukan ${data.crawlData.pages?.length || 0} halaman.`);
+        setActiveTab('sitemap'); // Auto-advance to Step 2
       } else if (!data.success) {
-        setLogs((prev) => `${prev}\n[ERROR] Crawl failed: ${data.error || 'Unknown error'}`);
+        setLogs((prev) => `${prev}\n[ERROR] Crawl gagal: ${data.error || 'Unknown error'}`);
       }
     } catch (err: any) {
-      setLogs((prev) => `${prev}\n[ERROR] Network error: ${err.message}`);
+      setLogs((prev) => `${prev}\n[ERROR] Gangguan jaringan: ${err.message}`);
     } finally {
       setIsLoading(false);
       refreshStatus();
@@ -85,7 +98,7 @@ export default function Home() {
   // Step 2: Generate Specs
   const handleGenerateSpecs = async () => {
     setIsLoading(true);
-    setLogs((prev) => `${prev}\n\n[ORCHESTRATOR] === Starting Test Specification Generator ===\nExecuting: tt generate...\n`);
+    setLogs((prev) => `${prev}\n\n[ORCHESTRATOR] === Menjalankan Generator Spesifikasi Pengujian ===\nPerintah: tt generate...\n`);
 
     try {
       const res = await fetch('/api/orchestrator/generate', {
@@ -100,13 +113,14 @@ export default function Home() {
 
       if (data.success && data.manifest) {
         setManifest(data.manifest);
-        setLogs((prev) => `${prev}\n[ORCHESTRATOR] Generator completed successfully in ${data.durationSeconds}s! Generated ${data.totalScenarios} test scenarios.`);
-        setActiveTab('manifest'); // Auto-advance to step 3
+        setHasGenerated(true);
+        setLogs((prev) => `${prev}\n[ORCHESTRATOR] Generator sukses dalam ${data.durationSeconds}s! Dihasilkan ${data.totalScenarios} skenario uji Playwright.`);
+        setActiveTab('manifest'); // Auto-advance to Step 3
       } else if (!data.success) {
-        setLogs((prev) => `${prev}\n[ERROR] Generate failed: ${data.error || 'Unknown error'}`);
+        setLogs((prev) => `${prev}\n[ERROR] Generate gagal: ${data.error || 'Unknown error'}`);
       }
     } catch (err: any) {
-      setLogs((prev) => `${prev}\n[ERROR] Network error: ${err.message}`);
+      setLogs((prev) => `${prev}\n[ERROR] Gangguan jaringan: ${err.message}`);
     } finally {
       setIsLoading(false);
       refreshStatus();
@@ -116,7 +130,7 @@ export default function Home() {
   // Step 3: Run Tests
   const handleRunTests = async (options: { grep?: string; headed?: boolean }) => {
     setIsLoading(true);
-    setLogs((prev) => `${prev}\n\n[ORCHESTRATOR] === Executing Playwright Test Suite ===\nGrep Filter: ${options.grep || 'All Scenarios'} | Headed: ${options.headed ? 'Yes' : 'No'}\n`);
+    setLogs((prev) => `${prev}\n\n[ORCHESTRATOR] === Menjalankan Suite Pengujian Playwright ===\nFilter: ${options.grep || 'Semua Skenario'} | Headed: ${options.headed ? 'Ya' : 'Tidak'}\n`);
 
     try {
       const res = await fetch('/api/orchestrator/run', {
@@ -133,11 +147,12 @@ export default function Home() {
       if (data.stats) {
         setExecutionStats(data.stats);
         setExecutionDuration(data.durationSeconds || 0);
-        setLogs((prev) => `${prev}\n[ORCHESTRATOR] Execution finished in ${data.durationSeconds}s: ${data.stats.passed} passed, ${data.stats.failed} failed, ${data.stats.skipped} skipped.`);
-        setActiveTab('runner'); // Auto-advance to step 4
+        setHasRun(true);
+        setLogs((prev) => `${prev}\n[ORCHESTRATOR] Eksekusi selesai dalam ${data.durationSeconds}s: ${data.stats.passed} lulus, ${data.stats.failed} gagal, ${data.stats.skipped} dilewati.`);
+        setActiveTab('runner'); // Auto-advance to Step 4
       }
     } catch (err: any) {
-      setLogs((prev) => `${prev}\n[ERROR] Test run failed: ${err.message}`);
+      setLogs((prev) => `${prev}\n[ERROR] Eksekusi uji gagal: ${err.message}`);
     } finally {
       setIsLoading(false);
       refreshStatus();
@@ -145,24 +160,27 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
-      {/* Navigation Header */}
+    <div className="min-h-screen bg-[#09090b] text-[#F5F5F0] flex flex-col font-sans selection:bg-[#EAB308] selection:text-black">
+      {/* Navigation Header for Respondents */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         lockState={lockState}
         onOpenSus={() => setIsSusOpen(true)}
+        isWorkflowCompleted={isWorkflowCompleted}
       />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Active Tab Panel */}
+        {/* Step 1: Config */}
         {activeTab === 'config' && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-zinc-100">Tahap 1: Konfigurasi Target Aplikasi & Crawl</h2>
-              <p className="text-xs text-zinc-400 mt-1">
-                Tentukan URL SUT, kredensial login, dan batasan eksplorasi untuk crawler otomatis Playwright.
+              <h2 className="font-heading text-xl font-bold tracking-tight text-[#F5F5F0]">
+                Tahap 1: Konfigurasi Target Aplikasi & Crawl
+              </h2>
+              <p className="font-sans text-xs text-[#A1A19D] mt-1">
+                Tentukan URL SUT, akun login, dan batasan eksplorasi untuk crawler otomatis Playwright.
               </p>
             </div>
             <ConfigWizard
@@ -173,11 +191,14 @@ export default function Home() {
           </div>
         )}
 
+        {/* Step 2: Sitemap */}
         {activeTab === 'sitemap' && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-zinc-100">Tahap 2: Visualisasi Model Sitemap & Form DOM</h2>
-              <p className="text-xs text-zinc-400 mt-1">
+              <h2 className="font-heading text-xl font-bold tracking-tight text-[#F5F5F0]">
+                Tahap 2: Visualisasi Struktur Sitemap & Form DOM
+              </h2>
+              <p className="font-sans text-xs text-[#A1A19D] mt-1">
                 Hasil crawling otomatis memetakan relasi halaman, formulir CRUD, tombol aksi, dan strategi locator.
               </p>
             </div>
@@ -190,11 +211,14 @@ export default function Home() {
           </div>
         )}
 
+        {/* Step 3: Manifest */}
         {activeTab === 'manifest' && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-zinc-100">Tahap 3: Matriks Skenario Pengujian (Manifest)</h2>
-              <p className="text-xs text-zinc-400 mt-1">
+              <h2 className="font-heading text-xl font-bold tracking-tight text-[#F5F5F0]">
+                Tahap 3: Matriks Skenario Pengujian (Manifest)
+              </h2>
+              <p className="font-sans text-xs text-[#A1A19D] mt-1">
                 Pilih skenario pengujian spesifikasi yang ingin dieksekusi berdasarkan tier (Positive, Negative, Edge) atau kategori.
               </p>
             </div>
@@ -207,45 +231,29 @@ export default function Home() {
           </div>
         )}
 
+        {/* Step 4: Runner */}
         {activeTab === 'runner' && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-zinc-100">Tahap 4: Dasbor Hasil Pengujian & Overhead Latensi</h2>
-              <p className="text-xs text-zinc-400 mt-1">
-                Hasil pengujian Playwright Chromium dan analisis benchmarking waktu eksekusi (ΔTime).
+              <h2 className="font-heading text-xl font-bold tracking-tight text-[#F5F5F0]">
+                Tahap 4: Hasil Eksekusi Pengujian Playwright
+              </h2>
+              <p className="font-sans text-xs text-[#A1A19D] mt-1">
+                Hasil pengujian Playwright Chromium dan ringkasan status kelulusan skenario (Passed / Failed).
               </p>
             </div>
             <ExecutionDashboard
               stats={executionStats}
               durationSeconds={executionDuration}
-              benchmarks={benchmarks}
               onOpenSus={() => setIsSusOpen(true)}
               onReRun={() => handleRunTests({})}
               isRunning={isLoading}
+              isWorkflowCompleted={isWorkflowCompleted}
             />
           </div>
         )}
 
-        {activeTab === 'benchmarks' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold tracking-tight text-zinc-100">Tahap 5: Metrik Penelitian & Evaluasi Usabilitas (SUS)</h2>
-              <p className="text-xs text-zinc-400 mt-1">
-                Data empiris benchmarking latensi dan hasil penilaian kuesioner System Usability Scale untuk Bab 4 Skripsi.
-              </p>
-            </div>
-            <ExecutionDashboard
-              stats={executionStats}
-              durationSeconds={executionDuration}
-              benchmarks={benchmarks}
-              onOpenSus={() => setIsSusOpen(true)}
-              onReRun={() => handleRunTests({})}
-              isRunning={isLoading}
-            />
-          </div>
-        )}
-
-        {/* Live Virtual Console (Always Visible at Bottom for Real-Time Feedback) */}
+        {/* Live Virtual Console (Terminal feedback for respondents) */}
         <div className="pt-4">
           <VirtualConsole
             logs={logs}
@@ -257,10 +265,14 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800/80 bg-zinc-950 py-6 mt-12 text-center text-xs text-zinc-500 font-mono">
+      <footer className="border-t border-[#27272a] bg-[#09090b] py-6 mt-12 text-center text-xs text-[#71717A] font-sans">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>orchesTathya Web Orchestrator • Skripsi Teknik Informatika</span>
-          <span className="text-zinc-600">Powered by Next.js 16 • TathyaTest CLI • Playwright</span>
+          <span className="font-heading font-medium text-[#A1A19D]">
+            orchesTathya Web Orchestrator • Penelitian Skripsi Teknik Informatika
+          </span>
+          <span className="font-mono text-[11px] text-[#71717A]">
+            Next.js 16 • TathyaTest CLI Engine • Playwright
+          </span>
         </div>
       </footer>
 
