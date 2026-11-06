@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat, Poppins, Geist_Mono } from "next/font/google";
+import { Montserrat, Poppins } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -11,16 +11,11 @@ const montserrat = Montserrat({
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "orchesTathya — Web Orchestrator for TathyaTest",
+  title: "TathyaTest Orchestrator",
   description: "Web Orchestration GUI, Latency Benchmark Suite, and Usability Evaluation for TathyaTest Engine",
 };
 
@@ -32,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${montserrat.variable} ${poppins.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${montserrat.variable} ${poppins.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-[#09090b] text-[#F5F5F0] font-sans">
         {children}

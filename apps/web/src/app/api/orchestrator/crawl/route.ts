@@ -7,9 +7,11 @@ import { getEnginePaths } from '@/lib/engine-paths';
 import { buildTathyaConfigYaml, TargetConfigInput } from '@/lib/config-builder';
 import { saveBenchmarkRecord } from '@/lib/benchmark-timer';
 
+const CRAWL_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes max for a crawl
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const userId = body.userId || `user_${Math.random().toString(36).substring(2, 7)}`;
+  const userId: string = body.userId || `user_${Math.random().toString(36).substring(2, 7)}`;
   const configInput: TargetConfigInput = body.config;
 
   // 1. Acquire mutex lock
@@ -29,42 +31,47 @@ export async function POST(req: NextRequest) {
 
     // 3. Prepare CLI execution
     const args = ['-c', 'tathya.config.yaml', 'crawl'];
-    const logs: string[] = [];
+    let fullLog = '';
+    let timedOut = false;
 
-    const exitCode = await new Promise<number>((resolve, reject) => {
+    const exitCode = await new Promise<number>((resolve) => {
       const child = spawn('node', [paths.cliScript, ...args], {
         cwd: paths.engineDir,
         shell: process.platform === 'win32',
         env: {
           ...process.env,
           NODE_OPTIONS: '--no-deprecation',
+          FORCE_COLOR: '0',
         },
       });
 
-      child.stdout.on('data', (chunk) => {
-        const text = chunk.toString();
-        logs.push(text);
-      });
+      const killTimer = setTimeout(() => {
+        timedOut = true;
+        try { child.kill('SIGTERM'); } catch {}
+        resolve(1);
+      }, CRAWL_TIMEOUT_MS);
 
-      child.stderr.on('data', (chunk) => {
-        const text = chunk.toString();
-        logs.push(text);
-      });
-
+      child.stdout.on('data', (chunk: Buffer) => { fullLog += chunk.toString(); });
+      child.stderr.on('data', (chunk: Buffer) => { fullLog += chunk.toString(); });
       child.on('error', (err) => {
-        logs.push(`\n[Process Error]: ${err.message}`);
-        reject(err);
+        fullLog += `\n[Process Error]: ${err.message}`;
+        clearTimeout(killTimer);
+        resolve(1);
       });
-
       child.on('close', (code) => {
-        resolve(code ?? 0);
+        clearTimeout(killTimer);
+        resolve(code ?? 1);
       });
     });
 
     const endTime = Date.now();
     const durationMs = endTime - startTime;
     const durationSeconds = +(durationMs / 1000).toFixed(2);
-    const success = exitCode === 0;
+    const success = exitCode === 0 && !timedOut;
+
+    if (timedOut) {
+      fullLog += `\n\n[ORCHESTRATOR] ⚠ Crawl dihentikan paksa setelah ${CRAWL_TIMEOUT_MS / 60000} menit (timeout).`;
+    }
 
     // 4. Save benchmark record
     const bench = saveBenchmarkRecord({
@@ -79,37 +86,37 @@ export async function POST(req: NextRequest) {
       targetUrl: configInput.baseUrl,
     });
 
-    // 5. Read output crawl file if successful
+    // 5. Read crawl output — try configured role name first, then fallback to any .json file
     let crawlData = null;
-    const role = configInput.role?.name || 'standard_user';
-    const crawlFile = path.join(paths.crawlDir, `${role}.json`);
+    const preferredRole = configInput.role?.name || 'standard_user';
+    const preferredFile = path.join(paths.crawlDir, `${preferredRole}.json`);
 
-    if (fs.existsSync(crawlFile)) {
-      try {
-        crawlData = JSON.parse(fs.readFileSync(crawlFile, 'utf-8'));
-      } catch (e) {
-        console.error('Failed to parse crawl JSON', e);
+    if (fs.existsSync(preferredFile)) {
+      try { crawlData = JSON.parse(fs.readFileSync(preferredFile, 'utf-8')); } catch {}
+    } else if (fs.existsSync(paths.crawlDir)) {
+      // Fallback: pick the first JSON file found in crawlDir
+      const files = fs.readdirSync(paths.crawlDir).filter((f) => f.endsWith('.json'));
+      if (files.length > 0) {
+        try { crawlData = JSON.parse(fs.readFileSync(path.join(paths.crawlDir, files[0]), 'utf-8')); } catch {}
       }
     }
 
     return NextResponse.json({
       success,
       exitCode,
+      timedOut,
       durationSeconds,
       benchmark: bench,
-      logs: logs.join(''),
+      logs: fullLog,
       crawlData,
+      userId,
     });
   } catch (err: any) {
     return NextResponse.json(
-      {
-        success: false,
-        error: err.message || 'Crawl execution failed',
-      },
+      { success: false, error: err.message || 'Crawl execution failed', userId },
       { status: 500 }
     );
   } finally {
-    // 6. Release mutex lock
     lockManager.release(userId);
   }
 }

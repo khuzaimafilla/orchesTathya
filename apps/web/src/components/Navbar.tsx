@@ -1,7 +1,17 @@
 'use client';
 
 import React from 'react';
-import { Cpu, Lock, Unlock, ShieldCheck } from 'lucide-react';
+import {
+  Cpu,
+  Lock,
+  ShieldCheck,
+  PanelRight,
+  PanelRightClose,
+  SlidersHorizontal,
+  Network,
+  ListChecks,
+  Play,
+} from 'lucide-react';
 import { LockState } from '@/lib/lock-manager';
 
 interface NavbarProps {
@@ -10,7 +20,19 @@ interface NavbarProps {
   lockState: LockState | null;
   onOpenSus: () => void;
   isWorkflowCompleted: boolean;
+  isConsoleOpen: boolean;
+  setIsConsoleOpen: (val: boolean) => void;
+  hasCrawled: boolean;
+  hasGenerated: boolean;
+  hasRun: boolean;
 }
+
+const STEPS = [
+  { id: 'config', label: 'Konfigurasi', icon: SlidersHorizontal, step: 1 },
+  { id: 'sitemap', label: 'Sitemap', icon: Network, step: 2 },
+  { id: 'manifest', label: 'Skenario', icon: ListChecks, step: 3 },
+  { id: 'runner', label: 'Eksekusi', icon: Play, step: 4 },
+] as const;
 
 export function Navbar({
   activeTab,
@@ -18,121 +40,128 @@ export function Navbar({
   lockState,
   onOpenSus,
   isWorkflowCompleted,
+  isConsoleOpen,
+  setIsConsoleOpen,
+  hasCrawled,
+  hasGenerated,
+  hasRun,
 }: NavbarProps) {
   const isLocked = lockState?.isLocked ?? false;
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const stepCompleted = (stepId: string) => {
+    if (!mounted) return false;
+    if (stepId === 'config') return hasCrawled;
+    if (stepId === 'sitemap') return hasGenerated;
+    if (stepId === 'manifest') return hasRun;
+    if (stepId === 'runner') return isWorkflowCompleted;
+    return false;
+  };
+
+  const canOpenSus = mounted && isWorkflowCompleted;
 
   return (
-    <header className="border-b border-[#27272a] bg-[#09090b]/95 backdrop-blur-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="border-b border-[#27272a] bg-[#121214] sticky top-0 z-50 h-14 shrink-0 select-none">
+      <div className="w-full h-full px-4 flex items-center justify-between gap-4">
         {/* Brand */}
-        <div className="flex items-center space-x-3.5">
-          <div className="w-9 h-9 rounded-xl bg-[#121214] border border-[#EAB308]/40 flex items-center justify-center shadow-md shadow-[#EAB308]/10">
-            <Cpu className="w-5 h-5 text-[#EAB308]" />
-          </div>
+        <div className="flex items-center space-x-2.5 shrink-0">
+          {/* <div className="w-7 h-7 rounded-lg bg-[#18181b] border border-[#EAB308]/40 flex items-center justify-center shadow-md shadow-[#EAB308]/10">
+            <Cpu className="w-3.5 h-3.5 text-[#EAB308]" />
+          </div> */}
           <div>
-            <div className="flex items-center space-x-2">
-              <span className="font-heading font-bold text-base tracking-tight text-[#F5F5F0]">
-                orchesTathya
-              </span>
-              <span className="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider rounded-md bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/30">
-                CLI Orchestrator
-              </span>
-            </div>
-            <p className="text-[11px] text-[#A1A19D] font-sans">
-              Pengujian Otomatis SUT & Evaluasi Usabilitas
-            </p>
+            <div className="font-heading font-bold text-sm tracking-tight text-[#F5F5F0]">
+              orchesTathya
+            </div>  
           </div>
         </div>
 
-        {/* Step Navigation Tabs */}
-        <nav className="hidden md:flex items-center space-x-1 bg-[#121214] p-1 rounded-xl border border-[#27272a]">
-          <button
-            onClick={() => setActiveTab('config')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-medium transition-all ${
-              activeTab === 'config'
-                ? 'bg-[#EAB308] text-black font-semibold shadow-sm'
-                : 'text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#1a1a1e]'
-            }`}
-          >
-            1. Konfigurasi SUT
-          </button>
+        {/* Step Navigation — with labels and completion indicators */}
+        <nav className="flex items-center bg-[#09090b] rounded-xl border border-[#27272a] p-1 gap-0.5">
+          {STEPS.map((step, idx) => {
+            const Icon = step.icon;
+            const isActive = activeTab === step.id;
+            const isDone = stepCompleted(step.id);
 
-          <button
-            onClick={() => setActiveTab('sitemap')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-medium transition-all ${
-              activeTab === 'sitemap'
-                ? 'bg-[#EAB308] text-black font-semibold shadow-sm'
-                : 'text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#1a1a1e]'
-            }`}
-          >
-            2. Struktur Sitemap
-          </button>
-
-          <button
-            onClick={() => setActiveTab('manifest')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-medium transition-all ${
-              activeTab === 'manifest'
-                ? 'bg-[#EAB308] text-black font-semibold shadow-sm'
-                : 'text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#1a1a1e]'
-            }`}
-          >
-            3. Matriks Skenario
-          </button>
-
-          <button
-            onClick={() => setActiveTab('runner')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-heading font-medium transition-all ${
-              activeTab === 'runner'
-                ? 'bg-[#EAB308] text-black font-semibold shadow-sm'
-                : 'text-[#A1A19D] hover:text-[#F5F5F0] hover:bg-[#1a1a1e]'
-            }`}
-          >
-            4. Eksekusi Pengujian
-          </button>
+            return (
+              <React.Fragment key={step.id}>
+                <button
+                  onClick={() => setActiveTab(step.id)}
+                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-heading font-medium transition-all ${
+                    isActive
+                      ? 'bg-[#EAB308] text-black shadow-sm'
+                      : isDone
+                      ? 'text-[#EAB308] hover:bg-[#18181b]'
+                      : 'text-[#71717A] hover:text-[#A1A19D] hover:bg-[#18181b]'
+                  }`}
+                  aria-label={`Tahap ${step.step}: ${step.label}`}
+                >
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden sm:inline">{step.label}</span>
+                </button>
+                {idx < STEPS.length - 1 && (
+                  <div className="w-px h-4 bg-[#27272a] mx-0.5" />
+                )}
+              </React.Fragment>
+            );
+          })}
         </nav>
 
-        {/* Right Section: Engine Lock & Gated SUS Action */}
-        <div className="flex items-center space-x-3">
-          {/* Engine Lock Status */}
-          <div
-            className={`hidden sm:flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-mono border ${
-              isLocked
-                ? 'bg-amber-950/40 text-amber-300 border-amber-800/60'
-                : 'bg-[#121214] text-emerald-400 border-emerald-900/40'
-            }`}
-          >
-            {isLocked ? (
-              <>
-                <Lock className="w-3 h-3 text-amber-400" />
-                <span>BUSY ({lockState?.activeStep})</span>
-              </>
-            ) : (
-              <>
-                <Unlock className="w-3 h-3 text-emerald-400" />
-                <span>READY</span>
-              </>
+        {/* Right Section */}
+        <div className="flex items-center space-x-2 shrink-0">
+          {/* Engine Lock Status: Clean typography without outline or background color */}
+          <div className="hidden sm:flex items-center space-x-1.5 text-[11px] select-none font-sans">
+            <span className="text-[#71717A]">Status Engine :</span>
+            <span className={`font-semibold tracking-wide ${isLocked ? 'text-[#EAB308]' : 'text-[#A1A19D]'}`}>
+              {isLocked ? (lockState?.activeStep ? lockState.activeStep.toUpperCase() : 'RUN') : 'IDLE'}
+            </span>
+            {isLocked && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#EAB308] animate-pulse ml-0.5" />
             )}
           </div>
 
-          {/* Gated SUS Survey Button: Enabled only if user completed the workflow */}
-          {isWorkflowCompleted ? (
+          {/* SUS Survey Button */}
+          {canOpenSus ? (
             <button
+              type="button"
               onClick={onOpenSus}
-              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-[#EAB308] hover:bg-[#FACC15] text-black text-xs font-heading font-bold shadow-md shadow-[#EAB308]/20 transition-all hover:scale-[1.02] active:scale-[0.98] animate-bounce"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#EAB308] hover:bg-[#FACC15] text-black text-[11px] font-heading font-bold shadow-md shadow-[#EAB308]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-black" />
               <span>Isi Kuesioner SUS</span>
             </button>
           ) : (
             <button
-              disabled
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#18181b] text-[#71717A] border border-[#27272a] text-xs font-heading font-medium cursor-not-allowed opacity-80"
-              title="Selesaikan alur pengujian (Crawl -> Generate -> Run) untuk membuka kuesioner usabilitas"
+              type="button"
+              disabled={true}
+              suppressHydrationWarning
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#18181b] text-[#52525b] border border-[#27272a] text-[11px] font-heading font-medium cursor-not-allowed"
+              title="Selesaikan alur pengujian (Crawl → Generate → Run) untuk membuka kuesioner usabilitas"
             >
               <Lock className="w-3 h-3" />
-              <span>Kuesioner SUS (Terkunci)</span>
+              <span className="hidden sm:inline">Kuesioner SUS</span>
             </button>
           )}
+
+          {/* Terminal Panel Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsConsoleOpen(!isConsoleOpen)}
+            className={`p-1.5 rounded-lg border transition-all ${
+              isConsoleOpen
+                ? 'bg-[#18181b] text-[#EAB308] border-[#EAB308]/30'
+                : 'bg-[#18181b] text-[#52525b] border-[#27272a] hover:text-[#A1A19D]'
+            }`}
+            title={isConsoleOpen ? 'Tutup Panel Terminal' : 'Buka Panel Terminal'}
+          >
+            {isConsoleOpen ? (
+              <PanelRightClose className="w-4 h-4" />
+            ) : (
+              <PanelRight className="w-4 h-4" />
+            )}
+          </button>
         </div>
       </div>
     </header>

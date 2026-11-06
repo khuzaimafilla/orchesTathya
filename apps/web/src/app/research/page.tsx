@@ -8,19 +8,27 @@ import {
   RefreshCw,
   BarChart2,
   ShieldCheck,
-  Cpu,
   Award,
   ArrowLeft,
   Unlock,
   Lock,
-  Layers,
   FileSpreadsheet,
-  CheckCircle2,
   Clock,
+  KeyRound,
+  LogOut,
+  AlertCircle,
 } from 'lucide-react';
 import { BenchmarkRecord } from '@/lib/benchmark-timer';
 
 export default function ResearchPortalPage() {
+  // Authentication PIN Gate State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [pinInput, setPinInput] = useState<string>('');
+  const [pinError, setPinError] = useState<string>('');
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [isCheckingSession, setIsCheckingSession] = useState<boolean>(true);
+
+  // Dashboard Data State
   const [benchmarks, setBenchmarks] = useState<BenchmarkRecord[]>([]);
   const [susData, setSusData] = useState<{ submissions: any[]; count: number; averageScore: number }>({
     submissions: [],
@@ -31,19 +39,80 @@ export default function ResearchPortalPage() {
   const [isResettingLock, setIsResettingLock] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState('');
 
+  // Check saved session token on mount
+  useEffect(() => {
+    const savedToken = sessionStorage.getItem('research_session_token');
+    if (savedToken) {
+      fetch(`/api/research/auth?token=${savedToken}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.valid) {
+            setIsAuthenticated(true);
+            fetchData();
+          } else {
+            sessionStorage.removeItem('research_session_token');
+          }
+        })
+        .catch(() => sessionStorage.removeItem('research_session_token'))
+        .finally(() => setIsCheckingSession(false));
+    } else {
+      setIsCheckingSession(false);
+    }
+  }, []);
+
+  // Live Auto-Refresh (Hot-Reload) telemetry data every 3 seconds when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const interval = setInterval(() => {
+      fetchData();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
+
+  const handleVerifyPin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPinError('');
+    setIsVerifying(true);
+
+    try {
+      const res = await fetch('/api/research/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: pinInput }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.token) {
+        sessionStorage.setItem('research_session_token', data.token);
+        setIsAuthenticated(true);
+        fetchData();
+      } else {
+        setPinError(data.error || 'PIN tidak valid. Akses ditolak.');
+      }
+    } catch (err: any) {
+      setPinError('Terjadi kesalahan jaringan.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleLockSession = () => {
+    sessionStorage.removeItem('research_session_token');
+    setIsAuthenticated(false);
+    setPinInput('');
+    setPinError('');
+  };
+
   const fetchData = async () => {
     try {
-      // 1. Fetch artifacts & benchmarks
       const artRes = await fetch('/api/orchestrator/artifacts');
       const artData = await artRes.json();
       if (artData.benchmarks) setBenchmarks(artData.benchmarks);
 
-      // 2. Fetch SUS data
       const susRes = await fetch('/api/evaluation/sus');
       const sus = await susRes.json();
       setSusData(sus);
 
-      // 3. Fetch lock status
       const statRes = await fetch('/api/orchestrator/status');
       const stat = await statRes.json();
       setLockStatus(stat.lock);
@@ -51,12 +120,6 @@ export default function ResearchPortalPage() {
       console.error('Failed to load research data', err);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleResetLock = async () => {
     setIsResettingLock(true);
@@ -141,6 +204,85 @@ export default function ResearchPortalPage() {
     ? +(runBenchmarks.reduce((acc, b) => acc + b.durationSeconds, 0) / runBenchmarks.length).toFixed(2)
     : 0;
 
+  // 1. Loading Screen while checking session
+  if (isCheckingSession) {
+    return (
+      <div className="min-h-screen bg-[#09090b] flex items-center justify-center font-sans">
+        <div className="flex items-center space-x-2 text-xs font-mono text-[#A1A19D]">
+          <RefreshCw className="w-4 h-4 animate-spin text-[#EAB308]" />
+          <span>Memverifikasi Sesi Peneliti...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. PIN Entry Gate Screen (If Not Authenticated)
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#09090b] text-[#F5F5F0] flex flex-col items-center justify-center p-4 font-sans selection:bg-[#EAB308] selection:text-black">
+        <div className="w-full max-w-md p-8 rounded-2xl bg-[#121214] border border-[#27272a] shadow-2xl space-y-6">
+          <div className="text-center space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-[#18181b] border border-[#EAB308]/40 flex items-center justify-center mx-auto text-[#EAB308] shadow-lg shadow-[#EAB308]/10">
+              <KeyRound className="w-7 h-7" />
+            </div>
+            <div>
+              <h2 className="font-heading text-xl font-bold tracking-tight text-[#F5F5F0]">
+                Akses Portal Peneliti Terkunci
+              </h2>
+              <p className="font-sans text-xs text-[#A1A19D] mt-1.5 leading-relaxed">
+                Halaman ini memuat data telemetri komputasi dan dataset survei usabilitas SUS. Masukkan PIN keamanan untuk melanjutkan.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleVerifyPin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-heading font-semibold text-[#F5F5F0] mb-1.5">
+                PIN Keamanan Peneliti
+              </label>
+              <input
+                type="password"
+                required
+                autoFocus
+                value={pinInput}
+                onChange={(e) => setPinInput(e.target.value)}
+                placeholder="Masukkan PIN (Default: 123456)"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#09090b] border border-[#27272a] text-sm text-[#F5F5F0] placeholder-[#71717A] focus:outline-none focus:border-[#EAB308] font-mono tracking-widest text-center"
+              />
+            </div>
+
+            {pinError && (
+              <div className="flex items-center space-x-2 p-3 rounded-lg bg-rose-950/40 border border-rose-900/50 text-xs text-rose-300">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                <span>{pinError}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isVerifying}
+              className="w-full py-2.5 rounded-xl bg-[#EAB308] hover:bg-[#FACC15] text-black font-heading text-xs font-bold shadow-md shadow-[#EAB308]/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+            >
+              <Unlock className="w-4 h-4 text-black" />
+              <span>{isVerifying ? 'Memverifikasi...' : 'Buka Kunci Akses'}</span>
+            </button>
+          </form>
+
+          <div className="pt-2 text-center border-t border-[#27272a]">
+            <Link
+              href="/"
+              className="text-xs font-sans text-[#71717A] hover:text-[#A1A19D] transition-colors inline-flex items-center space-x-1.5"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Kembali ke Halaman Utama</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Authenticated Research Dashboard
   return (
     <div className="min-h-screen bg-[#09090b] text-[#F5F5F0] flex flex-col font-sans selection:bg-[#EAB308] selection:text-black">
       {/* Header */}
@@ -163,7 +305,7 @@ export default function ResearchPortalPage() {
                   Portal Riset & Telemetri Skripsi
                 </span>
                 <span className="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider rounded-md bg-[#EAB308]/15 text-[#EAB308] border border-[#EAB308]/40">
-                  Secret Route: /research
+                  PIN Verified
                 </span>
               </div>
               <p className="text-[11px] text-[#A1A19D] font-sans">
@@ -173,8 +315,9 @@ export default function ResearchPortalPage() {
           </div>
 
           <div className="flex items-center space-x-3">
+
             {feedbackMsg && (
-              <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/40">
+              <span className="text-xs font-mono text-[#EAB308] bg-[#EAB308]/15 px-2.5 py-1 rounded-lg border border-[#EAB308]/30">
                 {feedbackMsg}
               </span>
             )}
@@ -185,6 +328,16 @@ export default function ResearchPortalPage() {
             >
               <RefreshCw className="w-3.5 h-3.5 text-[#EAB308]" />
               <span>Refresh</span>
+            </button>
+
+            {/* Lock / Logout Session Button */}
+            <button
+              onClick={handleLockSession}
+              className="px-3 py-1.5 rounded-lg text-xs font-heading font-semibold bg-[#121214] hover:bg-[#18181b] text-rose-400 border border-rose-900/40 transition-all flex items-center space-x-1.5"
+              title="Kunci sesi portal peneliti"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Kunci Sesi</span>
             </button>
           </div>
         </div>
@@ -245,7 +398,7 @@ export default function ResearchPortalPage() {
         <div className="p-4 rounded-xl bg-[#121214] border border-[#27272a] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-3 font-sans">
             <div className="p-2 rounded-lg bg-[#18181b] border border-[#27272a] text-[#EAB308]">
-              {lockStatus?.isLocked ? <Lock className="w-4 h-4 text-amber-400" /> : <Unlock className="w-4 h-4 text-emerald-400" />}
+              {lockStatus?.isLocked ? <Lock className="w-4 h-4 text-amber-400" /> : <Unlock className="w-4 h-4 text-[#EAB308]" />}
             </div>
             <div>
               <div className="text-xs font-heading font-semibold text-[#F5F5F0]">
@@ -312,10 +465,10 @@ export default function ResearchPortalPage() {
                       <td className="px-3 py-2 text-[#71717A]">{b.id}</td>
                       <td className="px-3 py-2 uppercase font-semibold text-[#EAB308]">{b.step}</td>
                       <td className="px-3 py-2 text-[#F5F5F0] truncate max-w-sm">{b.cliCommand}</td>
-                      <td className="px-3 py-2 font-bold text-emerald-400">{b.durationSeconds}s</td>
+                      <td className="px-3 py-2 font-bold text-[#EAB308]">{b.durationSeconds}s</td>
                       <td className="px-3 py-2">
                         {b.success ? (
-                          <span className="text-emerald-400 text-[10px]">SUCCESS</span>
+                          <span className="text-[#EAB308] text-[10px]">SUCCESS</span>
                         ) : (
                           <span className="text-rose-400 text-[10px]">FAILED</span>
                         )}
@@ -378,7 +531,7 @@ export default function ResearchPortalPage() {
                       <td className="px-3 py-2 font-medium text-[#F5F5F0]">{s.respondentName}</td>
                       <td className="px-3 py-2 text-[#A1A19D]">{s.respondentRole}</td>
                       <td className="px-3 py-2 font-bold text-[#EAB308] text-sm">{s.susScore}</td>
-                      <td className="px-3 py-2 text-emerald-400">{s.grade}</td>
+                      <td className="px-3 py-2 text-[#EAB308]">{s.grade}</td>
                       <td className="px-3 py-2 text-[#F5F5F0]">{s.acceptability}</td>
                       <td className="px-3 py-2 text-[#71717A] italic max-w-xs truncate">
                         {s.feedback || '-'}

@@ -198,10 +198,10 @@ export function ResearcherTelemetry({ benchmarks, onRefresh }: ResearcherTelemet
                     <td className="px-3 py-2 text-[#71717A]">{b.id}</td>
                     <td className="px-3 py-2 uppercase font-semibold text-[#EAB308]">{b.step}</td>
                     <td className="px-3 py-2 text-[#F5F5F0] truncate max-w-xs">{b.cliCommand}</td>
-                    <td className="px-3 py-2 font-bold text-emerald-400">{b.durationSeconds}s</td>
+                    <td className="px-3 py-2 font-bold text-[#EAB308]">{b.durationSeconds}s</td>
                     <td className="px-3 py-2">
                       {b.success ? (
-                        <span className="text-emerald-400 text-[10px]">SUCCESS</span>
+                        <span className="text-[#EAB308] text-[10px]">SUCCESS</span>
                       ) : (
                         <span className="text-rose-400 text-[10px]">FAILED</span>
                       )}
@@ -262,7 +262,7 @@ export function ResearcherTelemetry({ benchmarks, onRefresh }: ResearcherTelemet
                     <td className="px-3 py-2 font-medium text-[#F5F5F0]">{s.respondentName}</td>
                     <td className="px-3 py-2 text-[#A1A19D]">{s.respondentRole}</td>
                     <td className="px-3 py-2 font-bold text-[#EAB308]">{s.susScore}</td>
-                    <td className="px-3 py-2 text-emerald-400">{s.grade}</td>
+                    <td className="px-3 py-2 text-[#EAB308]">{s.grade}</td>
                     <td className="px-3 py-2 text-[#F5F5F0]">{s.acceptability}</td>
                     <td className="px-3 py-2 text-[#71717A] italic max-w-xs truncate">
                       {s.feedback || '-'}

@@ -5,9 +5,11 @@ import { lockManager } from '@/lib/lock-manager';
 import { getEnginePaths } from '@/lib/engine-paths';
 import { saveBenchmarkRecord } from '@/lib/benchmark-timer';
 
+const GENERATE_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes max for generate
+
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
-  const userId = body.userId || `user_${Math.random().toString(36).substring(2, 7)}`;
+  const userId: string = body.userId || `user_${Math.random().toString(36).substring(2, 7)}`;
 
   // 1. Acquire mutex lock
   const lockResult = lockManager.acquire(userId, 'generate');
@@ -16,38 +18,66 @@ export async function POST(req: NextRequest) {
   }
 
   const paths = getEnginePaths();
+
+  // 2. Pre-flight check: crawl must exist before generate
+  const hasCrawl = fs.existsSync(paths.crawlDir) &&
+    fs.readdirSync(paths.crawlDir).filter((f) => f.endsWith('.json')).length > 0;
+
+  if (!hasCrawl) {
+    lockManager.release(userId);
+    return NextResponse.json(
+      { success: false, error: 'Crawl belum dijalankan. Jalankan Crawl Engine terlebih dahulu (Tahap 1) sebelum menghasilkan skenario pengujian.' },
+      { status: 400 }
+    );
+  }
+
   const startTime = Date.now();
   const startedAtIso = new Date(startTime).toISOString();
+  const args = ['-c', 'tathya.config.yaml', 'generate'];
+  let fullLog = '';
+  let timedOut = false;
 
   try {
-    const args = ['-c', 'tathya.config.yaml', 'generate'];
-    const logs: string[] = [];
-
-    const exitCode = await new Promise<number>((resolve, reject) => {
+    const exitCode = await new Promise<number>((resolve) => {
       const child = spawn('node', [paths.cliScript, ...args], {
         cwd: paths.engineDir,
         shell: process.platform === 'win32',
         env: {
           ...process.env,
           NODE_OPTIONS: '--no-deprecation',
+          FORCE_COLOR: '0',
         },
       });
 
-      child.stdout.on('data', (chunk) => logs.push(chunk.toString()));
-      child.stderr.on('data', (chunk) => logs.push(chunk.toString()));
+      const killTimer = setTimeout(() => {
+        timedOut = true;
+        try { child.kill('SIGTERM'); } catch {}
+        resolve(1);
+      }, GENERATE_TIMEOUT_MS);
+
+      child.stdout.on('data', (chunk: Buffer) => { fullLog += chunk.toString(); });
+      child.stderr.on('data', (chunk: Buffer) => { fullLog += chunk.toString(); });
       child.on('error', (err) => {
-        logs.push(`\n[Process Error]: ${err.message}`);
-        reject(err);
+        fullLog += `\n[Process Error]: ${err.message}`;
+        clearTimeout(killTimer);
+        resolve(1);
       });
-      child.on('close', (code) => resolve(code ?? 0));
+      child.on('close', (code) => {
+        clearTimeout(killTimer);
+        resolve(code ?? 1);
+      });
     });
 
     const endTime = Date.now();
     const durationMs = endTime - startTime;
     const durationSeconds = +(durationMs / 1000).toFixed(2);
-    const success = exitCode === 0;
+    const success = exitCode === 0 && !timedOut;
 
-    // 2. Save benchmark
+    if (timedOut) {
+      fullLog += `\n\n[ORCHESTRATOR] ⚠ Generate dihentikan paksa setelah ${GENERATE_TIMEOUT_MS / 60000} menit (timeout).`;
+    }
+
+    // 3. Save benchmark
     const bench = saveBenchmarkRecord({
       step: 'generate',
       cliCommand: `node generator/dist/main.js ${args.join(' ')}`,
@@ -60,7 +90,7 @@ export async function POST(req: NextRequest) {
       targetUrl: 'tathya.config.yaml',
     });
 
-    // 3. Read manifest.json
+    // 4. Read manifest.json
     let manifestData = null;
     if (fs.existsSync(paths.manifestPath)) {
       try {
@@ -73,22 +103,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success,
       exitCode,
+      timedOut,
       durationSeconds,
       benchmark: bench,
-      logs: logs.join(''),
+      logs: fullLog,
       manifest: manifestData,
       totalScenarios: Array.isArray(manifestData) ? manifestData.length : 0,
+      userId,
     });
   } catch (err: any) {
     return NextResponse.json(
-      {
-        success: false,
-        error: err.message || 'Generate execution failed',
-      },
+      { success: false, error: err.message || 'Generate execution failed', userId },
       { status: 500 }
     );
   } finally {
-    // 4. Release lock
     lockManager.release(userId);
   }
 }

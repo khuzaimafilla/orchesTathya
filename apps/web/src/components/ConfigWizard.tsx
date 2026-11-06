@@ -48,11 +48,8 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
       {/* Preset Banner */}
       <div className="p-4 rounded-xl bg-[#121214] border border-[#27272a] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-[#18181b] border border-[#EAB308]/30 flex items-center justify-center text-[#EAB308]">
-            <BookmarkCheck className="w-5 h-5" />
-          </div>
           <div>
-            <h3 className="font-heading font-semibold text-sm text-[#F5F5F0]">Pilih Preset Target Uji (SUT)</h3>
+            <h3 className="font-heading font-semibold text-sm text-[#F5F5F0]">Pilih Preset Target Uji</h3>
             <p className="font-sans text-xs text-[#A1A19D]">
               Gunakan preset SauceDemo (React SPA e-commerce publik) untuk demonstrasi instan atau masukkan URL target custom.
             </p>
@@ -69,7 +66,7 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                 : 'bg-[#18181b] text-[#A1A19D] hover:text-[#F5F5F0] border border-[#27272a]'
             }`}
           >
-            SauceDemo SPA (Preset)
+            Preset
           </button>
           <button
             type="button"
@@ -80,7 +77,7 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
                 : 'bg-[#18181b] text-[#A1A19D] hover:text-[#F5F5F0] border border-[#27272a]'
             }`}
           >
-            Custom Target
+            Custom
           </button>
         </div>
       </div>
@@ -90,7 +87,6 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
           {/* Card 1: Target App & Authentication */}
           <div className="p-5 rounded-xl bg-[#121214] border border-[#27272a] space-y-4">
             <div className="flex items-center space-x-2 border-b border-[#27272a] pb-3">
-              <Globe className="w-4 h-4 text-[#EAB308]" />
               <h4 className="font-heading text-xs font-semibold text-[#F5F5F0] uppercase tracking-wider">
                 1. Target URL & Kredensial Login
               </h4>
@@ -98,7 +94,7 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
 
             <div className="space-y-3 font-sans">
               <div>
-                <label className="block text-xs font-medium text-[#A1A19D] mb-1">Base URL (SUT)</label>
+                <label className="block text-xs font-medium text-[#A1A19D] mb-1">Base URL</label>
                 <input
                   type="url"
                   required
@@ -168,7 +164,6 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
           {/* Card 2: Crawler & Extraction Constraints */}
           <div className="p-5 rounded-xl bg-[#121214] border border-[#27272a] space-y-4">
             <div className="flex items-center space-x-2 border-b border-[#27272a] pb-3">
-              <Compass className="w-4 h-4 text-[#EAB308]" />
               <h4 className="font-heading text-xs font-semibold text-[#F5F5F0] uppercase tracking-wider">
                 2. Batasan Crawler & Oracle Error
               </h4>
@@ -262,12 +257,12 @@ export function ConfigWizard({ onStartCrawl, isLoading, isLocked }: ConfigWizard
             {isLoading ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin text-black" />
-                <span>Sedang Melakukan Crawling & Ekstraksi...</span>
+                <span>Menjelajahi Halaman...</span>
               </>
             ) : (
               <>
                 <Play className="w-4 h-4 fill-black" />
-                <span>Simpan Konfigurasi & Mulai Crawl Engine</span>
+                <span>Mulai Crawl</span>
               </>
             )}
           </button>

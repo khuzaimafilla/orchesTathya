@@ -1,5 +1,181 @@
 [
   {
+    "id": "bench_1793878480232_xq81i",
+    "step": "run",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml run --workers 1 --headed",
+    "startedAt": "2026-11-05T11:30:02.231Z",
+    "endedAt": "2026-11-05T11:34:40.231Z",
+    "durationMs": 278000,
+    "durationSeconds": 278,
+    "success": false,
+    "exitCode": 1,
+    "targetUrl": "tathya.config.yaml",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793875186991_44b14",
+    "step": "run",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml run --workers 1 --headed",
+    "startedAt": "2026-11-05T10:28:10.407Z",
+    "endedAt": "2026-11-05T10:39:46.990Z",
+    "durationMs": 696583,
+    "durationSeconds": 696.58,
+    "success": false,
+    "exitCode": 1,
+    "targetUrl": "tathya.config.yaml",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793874479536_xd3og",
+    "step": "generate",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml generate",
+    "startedAt": "2026-11-05T10:27:58.318Z",
+    "endedAt": "2026-11-05T10:27:59.535Z",
+    "durationMs": 1217,
+    "durationSeconds": 1.22,
+    "success": true,
+    "exitCode": 0,
+    "targetUrl": "tathya.config.yaml",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793863080975_k09zk",
+    "step": "crawl",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml crawl",
+    "startedAt": "2026-11-05T07:17:48.469Z",
+    "endedAt": "2026-11-05T07:18:00.974Z",
+    "durationMs": 12505,
+    "durationSeconds": 12.51,
+    "success": true,
+    "exitCode": 0,
+    "targetUrl": "https://www.saucedemo.com",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793676346426_00vj1",
+    "step": "run",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml run --workers 1",
+    "startedAt": "2026-11-03T03:12:27.409Z",
+    "endedAt": "2026-11-03T03:25:46.425Z",
+    "durationMs": 799016,
+    "durationSeconds": 799.02,
+    "success": false,
+    "exitCode": 1,
+    "targetUrl": "tathya.config.yaml",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793675543548_dxmc2",
+    "step": "generate",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml generate",
+    "startedAt": "2026-11-03T03:12:22.506Z",
+    "endedAt": "2026-11-03T03:12:23.548Z",
+    "durationMs": 1042,
+    "durationSeconds": 1.04,
+    "success": true,
+    "exitCode": 0,
+    "targetUrl": "tathya.config.yaml",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793675529716_pnqma",
+    "step": "crawl",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml crawl",
+    "startedAt": "2026-11-03T03:11:57.001Z",
+    "endedAt": "2026-11-03T03:12:09.716Z",
+    "durationMs": 12715,
+    "durationSeconds": 12.71,
+    "success": true,
+    "exitCode": 0,
+    "targetUrl": "https://www.saucedemo.com",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793266689313_9cfet",
+    "step": "crawl",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml crawl",
+    "startedAt": "2026-10-29T09:37:36.557Z",
+    "endedAt": "2026-10-29T09:38:09.312Z",
+    "durationMs": 32755,
+    "durationSeconds": 32.76,
+    "success": false,
+    "exitCode": 1,
+    "targetUrl": "https://www.saucedemo.com",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793264865613_5acv1",
+    "step": "run",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml run --workers 1",
+    "startedAt": "2026-10-29T08:51:02.383Z",
+    "endedAt": "2026-10-29T09:07:45.611Z",
+    "durationMs": 1003228,
+    "durationSeconds": 1003.23,
+    "success": false,
+    "exitCode": 1,
+    "targetUrl": "tathya.config.yaml",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793263840274_49fm7",
+    "step": "generate",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml generate",
+    "startedAt": "2026-10-29T08:50:38.870Z",
+    "endedAt": "2026-10-29T08:50:40.273Z",
+    "durationMs": 1403,
+    "durationSeconds": 1.4,
+    "success": true,
+    "exitCode": 0,
+    "targetUrl": "tathya.config.yaml",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
+    "id": "bench_1793263806555_aac0c",
+    "step": "crawl",
+    "cliCommand": "node generator/dist/main.js -c tathya.config.yaml crawl",
+    "startedAt": "2026-10-29T08:49:52.933Z",
+    "endedAt": "2026-10-29T08:50:06.555Z",
+    "durationMs": 13622,
+    "durationSeconds": 13.62,
+    "success": true,
+    "exitCode": 0,
+    "targetUrl": "https://www.saucedemo.com",
+    "environment": {
+      "platform": "win32",
+      "nodeVersion": "v22.20.0"
+    }
+  },
+  {
     "id": "bench_1793261053572_rdwoc",
     "step": "run",
     "cliCommand": "node generator/dist/main.js -c tathya.config.yaml run --workers 1",

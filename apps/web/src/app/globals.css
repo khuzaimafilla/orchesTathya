@@ -5,7 +5,7 @@
   --foreground: #F5F5F0;
   --font-heading: var(--font-montserrat);
   --font-sans: var(--font-poppins);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-poppins);
 }
 
 @theme inline {
@@ -13,7 +13,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins);
   --font-heading: var(--font-montserrat);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-poppins);
 }
 
 body {
@@ -26,6 +26,10 @@ body {
 h1, h2, h3, h4, h5, h6, .font-heading {
   font-family: var(--font-montserrat), sans-serif;
   letter-spacing: -0.02em;
+}
+
+code, pre, kbd, samp, .font-mono {
+  font-family: var(--font-poppins), sans-serif;
 }
 
 /* Custom scrollbar styling in dark obsidian & gold */

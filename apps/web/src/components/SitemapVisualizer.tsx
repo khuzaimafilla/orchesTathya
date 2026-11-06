@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Network, FileText, ChevronRight, Layers, Sparkles, ExternalLink, ArrowRight } from 'lucide-react';
+import { Network, FileText, ChevronRight, Layers, MousePointerClick, ExternalLink, ArrowRight } from 'lucide-react';
 
 interface SitemapVisualizerProps {
   crawlData: any;
@@ -79,7 +79,7 @@ export function SitemapVisualizer({
 
         <div className="p-4 rounded-xl bg-[#121214] border border-[#27272a] flex items-center space-x-3.5">
           <div className="p-2.5 rounded-lg bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/30">
-            <Sparkles className="w-4 h-4" />
+            <MousePointerClick className="w-4 h-4" />
           </div>
           <div>
             <div className="font-heading text-lg font-bold text-[#F5F5F0]">{totalButtons}</div>
@@ -94,7 +94,6 @@ export function SitemapVisualizer({
         <div className="p-4 rounded-xl bg-[#121214] border border-[#27272a] space-y-3">
           <div className="flex items-center justify-between border-b border-[#27272a] pb-2.5">
             <h4 className="font-heading text-xs font-semibold text-[#F5F5F0] uppercase tracking-wider flex items-center space-x-1.5">
-              <Network className="w-3.5 h-3.5 text-[#EAB308]" />
               <span>Daftar Halaman ({pages.length})</span>
             </h4>
             <span className="text-[10px] text-[#A1A19D] font-mono">Role: {crawlData.role}</span>
@@ -137,9 +136,6 @@ export function SitemapVisualizer({
             <div>
               <div className="flex items-center space-x-2">
                 <span className="font-heading text-sm font-semibold text-[#F5F5F0]">{activePage.title || 'Untitled Page'}</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950 text-emerald-400 border border-emerald-800/60">
-                  HTTP 200
-                </span>
               </div>
               <p className="text-xs font-mono text-[#A1A19D] mt-0.5 break-all">{activePage.url}</p>
             </div>
@@ -154,8 +150,7 @@ export function SitemapVisualizer({
                   : 'bg-[#EAB308] hover:bg-[#FACC15] text-black shadow-md shadow-[#EAB308]/20'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{isGenerating ? 'Generating...' : 'Lanjut: Generate Test Specs'}</span>
+              <span>{isGenerating ? 'Menghasilkan Skenario...' : 'Lanjut ke Skenario Pengujian'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -163,7 +158,6 @@ export function SitemapVisualizer({
           {/* Forms Section */}
           <div className="space-y-3 font-sans">
             <h5 className="font-heading text-xs font-semibold text-[#F5F5F0] uppercase tracking-wider flex items-center space-x-1.5">
-              <FileText className="w-3.5 h-3.5 text-[#EAB308]" />
               <span>Formulir & Elemen Input ({activePage.forms?.length || 0})</span>
             </h5>
 
